@@ -8,6 +8,7 @@ namespace Player
 {
 	public class Movement : MonoBehaviour
 	{
+
 		//Movement States Enum
 		protected enum MovementStates
 		{
@@ -16,7 +17,6 @@ namespace Player
 			running,
 			crouched,
 			crouchedWalking,
-
 		}
 
 		// Player speed + modifier variables
@@ -40,20 +40,20 @@ namespace Player
 		// Movement
 		private Vector2 currentMovementValue;
 		private float currentMovementSpeed;
+		private MovementStates currentMovementState;
 
 		// Rotation
 		private float playerRotationValue;
 		private float cameraRotationValue;
 
-
-		private MovementStates currentMovementState;
-
+		// Components
 		private Collider playerCollider;
-		private MeshRenderer  playerMesh;
+		private MeshRenderer playerMesh;
 		private Rigidbody playerRigidbody;
 		private Camera playerCamera;
 
-
+		private bool crouchingBlocked;
+		private bool isGrounded;
 
 		private void Start()
 		{
@@ -76,16 +76,14 @@ namespace Player
 			transform.Translate(new Vector3(currentMovementValue.x, 0, currentMovementValue.y) * currentMovementSpeed * Time.deltaTime);
 		}
 
-		void OnMovement(InputValue inputValue)
+		public void CrouchingBlocked(bool isTrue)
 		{
-			currentMovementValue = inputValue.Get<Vector2>();
+			crouchingBlocked = isTrue;
 		}
 
-		void OnRotation(InputValue inputValue)
+		public void CheckGrounded(bool isTrue)
 		{
-			playerRotationValue = inputValue.Get<Vector2>().x;
-			cameraRotationValue = inputValue.Get<Vector2>().y;
-			RotateCamera(cameraRotationValue);
+			isGrounded = isTrue;
 		}
 
 		private void RotateCamera(float inputCameraRotationValue)
@@ -156,45 +154,27 @@ namespace Player
 				}
 			}
 		}
-
-		void OnJump()
+		void SetSpeed(float multiplier)
 		{
-			playerRigidbody.AddForce(0, jumpForce, 0, ForceMode.Impulse);
+			currentMovementSpeed = baseMovementSpeed * multiplier;
+			Debug.Log("Current Speed: " + currentMovementSpeed);
 		}
 
-		void OnCrouch()
+		public void OnMovement(Vector2 inputValue)
 		{
-			if (currentMovementState == MovementStates.normal || currentMovementState == MovementStates.walking)
-			{
-				if (currentMovementState == MovementStates.normal)
-				{
-					SetMovementMode(MovementStates.crouched);
-				}
-				else if (currentMovementState == MovementStates.walking)
-				{
-					SetMovementMode(MovementStates.crouchedWalking);
-				}
-				else { 
-				
-				}
-			}
-			else if (currentMovementState == MovementStates.crouched || currentMovementState == MovementStates.crouchedWalking)
-			{
-				if (currentMovementState == MovementStates.crouched)
-				{
-					SetMovementMode(MovementStates.normal);
-				}
-				else if (currentMovementState == MovementStates.crouchedWalking)
-				{
-					SetMovementMode(MovementStates.walking);
-				}
-			}
-
+			currentMovementValue = inputValue;
 		}
 
-		void OnWalk(InputValue inputValue)
+		public void OnRotation(Vector2 inputValue)
 		{
-			if (inputValue.isPressed)
+			playerRotationValue = inputValue.x;
+			cameraRotationValue = inputValue.y;
+			RotateCamera(cameraRotationValue);
+		}
+
+		public void OnWalk(bool isPressed)
+		{
+			if (isPressed)
 			{
 				if (currentMovementState == MovementStates.normal)
 				{
@@ -222,9 +202,9 @@ namespace Player
 			}
 		}
 
-		void OnRun(InputValue inputValue)
+		public void OnRun(bool isPressed)
 		{
-			if (inputValue.isPressed)
+			if (isPressed)
 			{
 				if (currentMovementState == MovementStates.normal)
 				{
@@ -240,10 +220,53 @@ namespace Player
 			}
 		}
 
-		void SetSpeed(float multiplier)
+		public void OnJump()
 		{
-			currentMovementSpeed = baseMovementSpeed * multiplier;
-			Debug.Log("Current Speed: " + currentMovementSpeed);
+			if (isGrounded)
+			{
+				playerRigidbody.AddForce(0, jumpForce, 0, ForceMode.Impulse);
+			}
 		}
+
+		public void OnCrouch()
+		{
+			if (currentMovementState == MovementStates.normal || currentMovementState == MovementStates.walking)
+			{
+				if (currentMovementState == MovementStates.normal)
+				{
+					SetMovementMode(MovementStates.crouched);
+				}
+				else if (currentMovementState == MovementStates.walking)
+				{
+					SetMovementMode(MovementStates.crouchedWalking);
+				}
+				else
+				{
+
+				}
+			}
+			else if (currentMovementState == MovementStates.crouched || currentMovementState == MovementStates.crouchedWalking)
+			{
+				if (crouchingBlocked)
+				{
+					Debug.Log("Cannot Stand Up Here!");
+				}
+				else 
+				{
+					if (currentMovementState == MovementStates.crouched)
+					{
+						SetMovementMode(MovementStates.normal);
+					}
+					else if (currentMovementState == MovementStates.crouchedWalking)
+					{
+						SetMovementMode(MovementStates.walking);
+					}
+				}
+				
+			}
+
+		}
+
+
 	}
 }
