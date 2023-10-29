@@ -15,6 +15,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Rotation",
+                    "type": "Value",
+                    "id": "4bd973cf-459c-43ae-9a14-d184f934dff0",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "Jump",
                     "type": "Button",
                     "id": "607bb609-f636-4001-b046-2cfb13d9f0f2",
@@ -24,28 +33,28 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Crouch",
-                    "type": "Button",
-                    "id": "8af9f919-9402-4ab9-ac41-71f9d751459b",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Rotation",
+                    "name": "Run",
                     "type": "Value",
-                    "id": "4bd973cf-459c-43ae-9a14-d184f934dff0",
-                    "expectedControlType": "Axis",
+                    "id": "825be04a-9384-43d5-9809-fd153fc5b397",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
                 },
                 {
-                    "name": "CameraRotation",
+                    "name": "Walk",
                     "type": "Value",
-                    "id": "3fb2f41d-ff72-4258-b919-b449eb9e6fa6",
-                    "expectedControlType": "Axis",
+                    "id": "a03dd837-ba22-4af2-b136-eba6afa8d8f7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Crouch",
+                    "type": "Button",
+                    "id": "8af9f919-9402-4ab9-ac41-71f9d751459b",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -120,6 +129,28 @@
                 },
                 {
                     "name": "",
+                    "id": "5dd3a0ab-8926-4b07-8507-9b9f9212852f",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Run",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3997afd6-b69b-4b68-94bb-1ac8026fb0b3",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Walk",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "2c513bbb-6c60-4c06-9b21-b1632c990049",
                     "path": "<Keyboard>/ctrl",
                     "interactions": "",
@@ -130,48 +161,59 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "1D Axis",
-                    "id": "a860761f-9821-4e18-b1e3-d808b98f137c",
-                    "path": "1DAxis",
+                    "name": "2D Vector",
+                    "id": "43750c03-068a-4b7a-b514-6d9dd640a165",
+                    "path": "2DVector(mode=2)",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "CameraRotation",
+                    "action": "Rotation",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "positive",
-                    "id": "7d72162d-3640-4a38-9251-3b59910c5f80",
+                    "name": "up",
+                    "id": "a028d57a-35e6-4e13-b369-ac01b5d5ab7e",
                     "path": "<Mouse>/delta/up",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "CameraRotation",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "negative",
-                    "id": "cb6782ec-5f20-4554-9251-fd5cdd596d4e",
-                    "path": "<Mouse>/delta/down",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "CameraRotation",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "",
-                    "id": "65f31eed-806d-4582-b345-af40bd4d56e5",
-                    "path": "<Mouse>/delta/y",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "Rotation",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "b43bd25b-db73-43a4-958f-e7c79149fefe",
+                    "path": "<Mouse>/delta/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Rotation",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "e36ee723-4978-475d-b69e-7b524f289f5c",
+                    "path": "<Mouse>/delta/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Rotation",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "698370d7-2d84-43d4-b72c-3f75fbd69ec6",
+                    "path": "<Mouse>/delta/right",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard & Mouse",
+                    "action": "Rotation",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }
