@@ -5,11 +5,21 @@ using UnityEngine.Rendering;
 
 public class LightBasedDetection : MonoBehaviour
 {
+
+	[SerializeField] private floatEvent visibilityReading;
+
 	private LightProbeGroup storageRoomLightProbes;
 	private SphericalHarmonicsL2[] probes = new SphericalHarmonicsL2[2];
 	private Renderer playerMeshRenderer;
 
+	private float visibilityPercentage;
+
 	[SerializeField] private Transform startingProbeTransform;
+
+	public float GetVisibility()
+	{
+		return visibilityPercentage;
+	}
 
 	private void Start()
 	{
@@ -23,16 +33,15 @@ public class LightBasedDetection : MonoBehaviour
 		{
 			Color resultTotal = new Color(0, 0, 0, 1);
 
+			// Take detection readings
 			for (int i = 0; i < 2; i++)
 			{
 				LightProbes.GetInterpolatedProbe(startingProbeTransform.position + new Vector3(0, -i, 0), playerMeshRenderer, out probes[i]);
 				resultTotal += LightLevelAverage(probes[i]);
 			}
 
+			// Average probe data
 			Color32 convertedColor = resultTotal / probes.Length;
-
-			Debug.Log("Average Color Level: " + convertedColor);
-
 			float[] colorComponent = new float[3];
 
 			colorComponent[0] = convertedColor.r;
@@ -43,26 +52,25 @@ public class LightBasedDetection : MonoBehaviour
 
 			for(int i = 0; i < 3; i++)
 			{
+				Debug.Log(colorComponent[i]);
 				colorTotal += colorComponent[i];
 			}
 
+			// Calculate visibility percentage
 			colorTotal = colorTotal / colorComponent.Length;
 
-			Debug.Log("Average Light Level: " + colorTotal);
+			visibilityPercentage = (colorTotal / 255) * 100;
+
+			visibilityReading?.Invoke(255 - colorTotal);
 
 			yield return new WaitForSeconds(0.5f);
 		}
 	}
 
-	private Color ReturnResult(Color probeAverage)
-	{
-		if(probeAverage == null) return new Color(0, 0, 0, 1);
-		return probeAverage;
-	}
-
 	private Color LightLevelAverage(SphericalHarmonicsL2 inputProbeData)
 	{
 
+		// Color and Vector arrays
 		Vector3[] directions = new Vector3[]
 		{
 			// Up and down
@@ -81,8 +89,10 @@ public class LightBasedDetection : MonoBehaviour
 
 		Color[] results = new Color[directions.Length];
 
+		// Evaulate Harmonics
 		inputProbeData.Evaluate(directions, results);
 
+		// Average probe result
 		Color averageResult = new Color(0,0,0,1);
 
 		for (int i = 0; i < results.Length; i++)

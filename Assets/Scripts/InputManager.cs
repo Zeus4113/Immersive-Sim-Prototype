@@ -10,6 +10,8 @@ using UnityEngine.Serialization;
 [System.Serializable] public class Vector2Event : UnityEvent <Vector2> { }
 [System.Serializable] public class BoolEvent : UnityEvent <bool> { }
 
+[System.Serializable] public class floatEvent : UnityEvent <float> { }
+
 public class InputManager : MonoBehaviour
 {
 
