@@ -4,18 +4,20 @@ using UnityEngine;
 
 public class RaycastCheck : MonoBehaviour
 {
-	private Transform[] raycastOrigins;
+	private Transform[] raycastOrigins = new Transform[3];
 	private float playerVisibility;
+	private IEnumerator[] runningCoroutines = new IEnumerator[0];
+	private Transform[] currentLightingObjects = new Transform[0];
 
 	private void Start()
 	{
-		playerVisibility = 0f;
-		raycastOrigins = new Transform[transform.childCount];
 
 		for(int i = 0; i < raycastOrigins.Length; i++)
 		{
-			raycastOrigins[i] = transform.GetChild(i);
-		}
+			raycastOrigins[i] = Instantiate(new GameObject().transform, (transform.position - new Vector3(0, (i / 2), 0)),Quaternion.identity);
+			raycastOrigins[i].transform.SetParent(transform);
+
+        }
 	}
 
 	public float GetVisibility()
@@ -27,7 +29,7 @@ public class RaycastCheck : MonoBehaviour
 	{
 		if (isTrue)
 		{
-			StartCoroutine(CheckRaycasts(lightSource));
+			StartCoroutine(CheckRaycasts(lightSource, raycastOrigins));
 		}
 		else
 		{
@@ -36,18 +38,18 @@ public class RaycastCheck : MonoBehaviour
 		}
 	}
 
-	private IEnumerator CheckRaycasts(Transform lightSource)
-	{
+	private IEnumerator CheckRaycasts(Transform lightSource, Transform[] originTransforms)
+    {
 		while (true)
 		{
 			float currentVisibility = 0f;
 
-			for (int i = 0; i < raycastOrigins.Length; i++)
+			for (int i = 0; i < originTransforms.Length; i++)
 			{
 				RaycastHit hit = new RaycastHit();
 				LayerMask mask = LayerMask.GetMask("Player", "Environment");
-				Physics.Raycast(lightSource.position, (raycastOrigins[i].position - lightSource.position).normalized, out hit);
-				Debug.DrawLine(lightSource.position, (raycastOrigins[i].position - lightSource.position).normalized * 100f, Color.red, 0.1f);
+				Physics.Raycast(lightSource.position, (originTransforms[i].position - lightSource.position).normalized, out hit);
+				Debug.DrawLine(lightSource.position, (originTransforms[i].position - lightSource.position).normalized * 100f, Color.red, 0.1f);
 
 				if(hit.collider != null)
 				{

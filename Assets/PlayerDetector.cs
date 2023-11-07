@@ -1,17 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerDetector : MonoBehaviour
 {
+
 	private void OnTriggerEnter(Collider other)
 	{
 		if (other.gameObject == null) return;
 
 		if (other.gameObject.CompareTag("Player"))
 		{
-			RaycastCheck playerChecker = other.gameObject.GetComponentInChildren<RaycastCheck>();
-			playerChecker.TriggerCoroutine(this.transform, true);
+			RaycastManager raycastCheck = other.transform.GetChild(1).GetChild(0).GetComponent<RaycastManager>();
+            raycastCheck.RegisterNewRaycast(this.transform);
 		}
 	}
 
@@ -21,8 +23,9 @@ public class PlayerDetector : MonoBehaviour
 
 		if (other.gameObject.CompareTag("Player"))
 		{
-			RaycastCheck playerChecker = other.gameObject.GetComponentInChildren<RaycastCheck>();
-			playerChecker.TriggerCoroutine(this.transform, false);
+			RaycastManager raycastCheck = other.transform.GetChild(1).GetChild(0).GetComponent<RaycastManager>();
+			raycastCheck.RemoveRegisteredRaycast(this.transform);
+
 		}
 	}
 }
