@@ -8,8 +8,7 @@ public class LightBasedDetection : MonoBehaviour
 
 	[SerializeField] private floatEvent visibilityReading;
 
-	private LightProbeGroup storageRoomLightProbes;
-	private SphericalHarmonicsL2[] probes = new SphericalHarmonicsL2[6];
+	private SphericalHarmonicsL2[] probes;
 	private MeshRenderer playerMeshRenderer;
 
 	private float visibilityPercentage;
@@ -40,17 +39,18 @@ public class LightBasedDetection : MonoBehaviour
 				// Y Axis
 				new Vector3(0,1,0),
 				new Vector3(0,-1,0),
+				new Vector3(0,0,0),
 
-				// X Axis
-				new Vector3(0.5f,0,0),
-				new Vector3(-0.5f,0,0),
+				//// X Axis
+				//new Vector3(0.5f,0,0),
+				//new Vector3(-0.5f,0,0),
 
-				// Z Axis
-				new Vector3(0,0,0.5f),
-				new Vector3(0,0,-0.5f),
+				//// Z Axis
+				//new Vector3(0,0,0.5f),
+				//new Vector3(0,0,-0.5f),
 			};
 
-
+			probes = new SphericalHarmonicsL2[probeLocations.Length];
 
 
 			// Take detection readings
@@ -91,83 +91,76 @@ public class LightBasedDetection : MonoBehaviour
 
 	private Color LightLevelAverage(SphericalHarmonicsL2 inputProbeData, int index)
 	{
-		Vector3[] directions = new Vector3[5];
 
-		switch (index)
-		{
-			case 0:
-				directions[0] = new Vector3(0.0f, 1.0f, 0.0f);
-				directions[1] = new Vector3(0.5f, 0, 0);
-				directions[2] = new Vector3(-0.5f, 0, 0);
-				directions[3] = new Vector3(0.0f, 0.0f, 0.5f);
-				directions[4] = new Vector3(0.0f, 0.0f, -0.5f);
-				break;
-			case 1:
-				directions[0] = new Vector3(0.0f, -1.0f, 0.0f);
-				directions[1] = new Vector3(0.5f, 0, 0);
-				directions[2] = new Vector3(-0.5f, 0, 0);
-				directions[3] = new Vector3(0.0f, 0.0f, 0.5f);
-				directions[4] = new Vector3(0.0f, 0.0f, -0.5f);
-				break;
-			case 2:
-				directions[0] = new Vector3(0.0f, 1.0f, 0.0f);
-				directions[1] = new Vector3(0.0f, -1.0f, 0.0f);
-				directions[2] = new Vector3(0.5f, 0, 0);
-				directions[3] = new Vector3(0.0f, 0.0f, 0.5f);
-				directions[4] = new Vector3(0.0f, 0.0f, -0.5f);
-				break;
-			case 3:
-				directions[0] = new Vector3(0.0f, 1.0f, 0.0f);
-				directions[1] = new Vector3(0.0f, -1.0f, 0.0f);
-				directions[2] = new Vector3(-0.5f, 0, 0);
-				directions[3] = new Vector3(0.0f, 0.0f, 0.5f);
-				directions[4] = new Vector3(0.0f, 0.0f, -0.5f);
-				break;
-			case 4:
-				directions[0] = new Vector3(0.0f, 1.0f, 0.0f);
-				directions[1] = new Vector3(0.0f, -1.0f, 0.0f);
-				directions[2] = new Vector3(0.5f, 0, 0);
-				directions[3] = new Vector3(-0.5f, 0, 0);
-				directions[4] = new Vector3(0.0f, 0.0f, 0.5f);
-				break;
-			case 5:
-				directions[0] = new Vector3(0.0f, 1.0f, 0.0f);
-				directions[1] = new Vector3(0.0f, -1.0f, 0.0f);
-				directions[2] = new Vector3(0.5f, 0, 0);
-				directions[3] = new Vector3(-0.5f, 0, 0);
-				directions[4] = new Vector3(0.0f, 0.0f, -0.5f);
-				break;
-			default:
-				break;
-		}
-
-		//// Color and Vector arrays
-		//Vector3[] directions = new Vector3[]
+		//switch (index)
 		//{
-		//	// Up and down
-		//	new Vector3(0.0f, 1.0f, 0.0f),
-		//	new Vector3(0.0f, -1.0f, 0.0f),
+		//	case 0:
+		//		directions[0] = new Vector3(0.0f, 1.0f, 0.0f);
+		//		directions[1] = new Vector3(0.5f, 0, 0);
+		//		directions[2] = new Vector3(-0.5f, 0, 0);
+		//		directions[3] = new Vector3(0.0f, 0.0f, 0.5f);
+		//		directions[4] = new Vector3(0.0f, 0.0f, -0.5f);
+		//		break;
+		//	case 1:
+		//		directions[0] = new Vector3(0.0f, -1.0f, 0.0f);
+		//		directions[1] = new Vector3(0.5f, 0, 0);
+		//		directions[2] = new Vector3(-0.5f, 0, 0);
+		//		directions[3] = new Vector3(0.0f, 0.0f, 0.5f);
+		//		directions[4] = new Vector3(0.0f, 0.0f, -0.5f);
+		//		break;
+		//	case 2:
+		//		directions[0] = new Vector3(0.0f, 1.0f, 0.0f);
+		//		directions[1] = new Vector3(0.0f, -1.0f, 0.0f);
+		//		directions[2] = new Vector3(0.5f, 0, 0);
+		//		directions[3] = new Vector3(0.0f, 0.0f, 0.5f);
+		//		directions[4] = new Vector3(0.0f, 0.0f, -0.5f);
+		//		break;
+		//	case 3:
+		//		directions[0] = new Vector3(0.0f, 1.0f, 0.0f);
+		//		directions[1] = new Vector3(0.0f, -1.0f, 0.0f);
+		//		directions[2] = new Vector3(-0.5f, 0, 0);
+		//		directions[3] = new Vector3(0.0f, 0.0f, 0.5f);
+		//		directions[4] = new Vector3(0.0f, 0.0f, -0.5f);
+		//		break;
+		//	case 4:
+		//		directions[0] = new Vector3(0.0f, 1.0f, 0.0f);
+		//		directions[1] = new Vector3(0.0f, -1.0f, 0.0f);
+		//		directions[2] = new Vector3(0.5f, 0, 0);
+		//		directions[3] = new Vector3(-0.5f, 0, 0);
+		//		directions[4] = new Vector3(0.0f, 0.0f, 0.5f);
+		//		break;
+		//	case 5:
+		//		directions[0] = new Vector3(0.0f, 1.0f, 0.0f);
+		//		directions[1] = new Vector3(0.0f, -1.0f, 0.0f);
+		//		directions[2] = new Vector3(0.5f, 0, 0);
+		//		directions[3] = new Vector3(-0.5f, 0, 0);
+		//		directions[4] = new Vector3(0.0f, 0.0f, -0.5f);
+		//		break;
+		//	default:
+		//		break;
+		//}
 
-		//	// Forwards and backwards
-		//	new Vector3(1.0f, 0f, 0f),
-		//	new Vector3(-1.0f, 0f, 0f),
+		// Color and Vector arrays
+		Vector3[] directions = new Vector3[]
+		{
+			// Up and down
+			new Vector3(0.0f, 1.0f, 0.0f),
+			new Vector3(0.0f, -1.0f, 0.0f),
 
-		//	// Left and right
-		//	new Vector3(0f, 0f, 1.0f),
-		//	new Vector3(0f, 0f, -1.0f),
+			// Forwards and backwards
+			new Vector3(1.0f, 0f, 0f),
+			new Vector3(-1.0f, 0f, 0f),
 
-		//};
+			// Left and right
+			new Vector3(0f, 0f, 1.0f),
+			new Vector3(0f, 0f, -1.0f),
+
+		};
 
 		Color[] results = new Color[directions.Length];
 
 		// Evaulate Harmonics
 		inputProbeData.Evaluate(directions, results);
-
-		for(int i = 0; i < results.Length; i++)
-		{
-			Debug.Log(results[i]);
-		}
-
 
 		// Average probe result
 		Color averageResult = new Color(0,0,0,1);
