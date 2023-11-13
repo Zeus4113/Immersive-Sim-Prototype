@@ -13,7 +13,7 @@ public class StandChecker : MonoBehaviour
 
 	private void OnTriggerExit(Collider other)
 	{
-		if(other.gameObject != this.transform.parent.gameObject)
+		if(!other.gameObject.CompareTag("Player"))
 		{
 			movementComponent.CrouchingBlocked(false);
 		}
@@ -21,7 +21,7 @@ public class StandChecker : MonoBehaviour
 
 	private void OnTriggerStay(Collider other)
 	{
-		if (other.gameObject != this.transform.parent.gameObject)
+		if (!other.gameObject.CompareTag("Player"))
 		{
 			movementComponent.CrouchingBlocked(true);
 		}

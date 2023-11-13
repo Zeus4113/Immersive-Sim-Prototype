@@ -6,18 +6,18 @@ using UnityEngine.InputSystem;
 
 namespace Player
 {
+	//Movement States Enum
+	public enum MovementStates
+	{
+		normal,
+		walking,
+		running,
+		crouched,
+		crouchedWalking,
+	}
+
 	public class Movement : MonoBehaviour
 	{
-
-		//Movement States Enum
-		protected enum MovementStates
-		{
-			normal,
-			walking,
-			running,
-			crouched,
-			crouchedWalking,
-		}
 
 		// Player speed + modifier variables
 		[SerializeField] private float baseMovementSpeed = 10f;
@@ -132,7 +132,12 @@ namespace Player
 					break;
 			}
 
-			Debug.Log("Current State: " + currentMovementState);
+			//Debug.Log("Current State: " + currentMovementState);
+		}
+
+		public MovementStates GetMovementState()
+		{
+			return currentMovementState;
 		}
 
 		void SetCapsule(string type)
@@ -157,7 +162,7 @@ namespace Player
 		void SetSpeed(float multiplier)
 		{
 			currentMovementSpeed = baseMovementSpeed * multiplier;
-			Debug.Log("Current Speed: " + currentMovementSpeed);
+			//Debug.Log("Current Speed: " + currentMovementSpeed);
 		}
 
 		public void OnMovement(Vector2 inputValue)

@@ -15,7 +15,7 @@ public class RaycastManager : MonoBehaviour
 		registeredLights[registeredLights.Length] = lightObject;
 		RaycastCheck newCheck = Instantiate(new GameObject().AddComponent<RaycastCheck>(), transform);
 		checks_.Add(newCheck);
-		newCheck.TriggerCoroutine(lightObject, true);
+		//newCheck.TriggerCoroutine(lightObject, true);
 	}
 
 	public void RemoveRegisteredRaycast(Transform lightObject)
@@ -34,7 +34,7 @@ public class RaycastManager : MonoBehaviour
 		{
 			if (registeredLights[i] == lightObject)
 			{
-				checks[checks.Length].TriggerCoroutine(lightObject, false);
+				//checks[checks.Length].TriggerCoroutine(lightObject, false);
 				registeredLights[i] = null;
 				Destroy(checks[i]);
 			}

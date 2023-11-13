@@ -8,7 +8,7 @@ public class TextureDetector : MonoBehaviour
 	private Transform raycastOrigin;
 	private float brightness;
 
-	void Awake()
+	void Start()
 	{
 		brightness = 0f;
 		raycastOrigin = transform;
@@ -22,7 +22,6 @@ public class TextureDetector : MonoBehaviour
 
 	private IEnumerator DetectFloorCollider()
 	{
-
 		while (true)
 		{
 			RaycastHit hit;
@@ -59,6 +58,7 @@ public class TextureDetector : MonoBehaviour
 
 			//brightnessPercentage = Mathf.Round(brightnessPercentage);
 
+			Debug.Log("Texture Output: " + brightness);
 			yield return new WaitForSeconds(0.1f);
 		}
 	}
