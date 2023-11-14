@@ -26,7 +26,7 @@ public class TextureDetector : MonoBehaviour
 		{
 			RaycastHit hit;
 			LayerMask layerMask = LayerMask.GetMask("Environment");
-			Physics.Raycast(raycastOrigin.position, Vector3.down, out hit, 10f);
+			Physics.Raycast(raycastOrigin.position, Vector3.down, out hit, 10f, layerMask);
 			Debug.DrawLine(raycastOrigin.position, raycastOrigin.position + new Vector3(0, -1, 0), Color.red, 0.1f);
 
 			if (hit.collider == null) yield return null;
@@ -58,7 +58,6 @@ public class TextureDetector : MonoBehaviour
 
 			//brightnessPercentage = Mathf.Round(brightnessPercentage);
 
-			Debug.Log("Texture Output: " + brightness);
 			yield return new WaitForSeconds(0.1f);
 		}
 	}

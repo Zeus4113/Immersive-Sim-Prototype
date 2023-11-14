@@ -27,7 +27,6 @@ public class VisibilityCalculator : MonoBehaviour
 		while (true)
 		{
 			float totalValue = DetermineTotalVisibility(DetermineRaycastVisibility(), DetermineTextureVisibility());
-			Debug.Log("Visibility: " + totalValue + "%");
 
 			float indicatorOpacity = 0f;
 			indicatorOpacity = (totalValue / 100);
@@ -81,8 +80,6 @@ public class VisibilityCalculator : MonoBehaviour
 			visibilityTotal = Mathf.Round(Mathf.Clamp((visibilityTotal) * 100, 0, 100));
 		}
 
-		Debug.Log("Raycast: " + visibilityTotal);
-
 		return visibilityTotal;
 	}
 
@@ -95,8 +92,6 @@ public class VisibilityCalculator : MonoBehaviour
 		visibilityTotal += playerTextureDetector.GetVisibility();
 
 		visibilityTotal = Mathf.Round(Mathf.Clamp((visibilityTotal) * 100, 0, 100));
-
-		Debug.Log("Texture: " + visibilityTotal);
 
 		return visibilityTotal;
 	}

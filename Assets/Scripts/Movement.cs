@@ -9,6 +9,7 @@ namespace Player
 	//Movement States Enum
 	public enum MovementStates
 	{
+		idle,
 		normal,
 		walking,
 		running,
@@ -70,10 +71,21 @@ namespace Player
 			SetMovementMode(MovementStates.normal);
 		}
 
-		private void Update()
+		private void FixedUpdate()
 		{
-			transform.Rotate(new Vector3(0, playerRotationValue * mouseSensitivityPlayer, 0));
-			transform.Translate(new Vector3(currentMovementValue.x, 0, currentMovementValue.y) * currentMovementSpeed * Time.deltaTime);
+			//transform.Rotate(new Vector3(0, playerRotationValue * mouseSensitivityPlayer, 0));
+			//transform.Translate(new Vector3(currentMovementValue.x, 0, currentMovementValue.y) * currentMovementSpeed * Time.deltaTime);
+			//playerRigidbody.MovePosition(playerRigidbody.position + direction * currentMovementSpeed * Time.fixedDeltaTime);
+			//playerRigidbody.angularVelocity = new Vector3(0, playerRotationValue * mouseSensitivityPlayer, 0) * Time.fixedDeltaTime;
+			//playerRigidbody.AddForce(direction * (currentMovementSpeed / 10), ForceMode.VelocityChange);
+
+			Vector3 direction = playerRigidbody.rotation * new Vector3(currentMovementValue.x, 0, currentMovementValue.y);
+			Vector3 velocity = direction * currentMovementSpeed * 100 * Time.fixedDeltaTime;
+			velocity.y = playerRigidbody.velocity.y;
+			playerRigidbody.velocity = velocity;
+
+			Quaternion rotation = Quaternion.Euler(new Vector3(0, playerRotationValue * mouseSensitivityPlayer, 0) * Time.fixedDeltaTime);
+			playerRigidbody.MoveRotation(playerRigidbody.rotation * rotation);
 		}
 
 		public void CrouchingBlocked(bool isTrue)
@@ -93,7 +105,7 @@ namespace Player
 			playerCamera.transform.localRotation = Quaternion.Euler(clampedValue, 0, 0);
 		}
 
-		void SetMovementMode(MovementStates currentState)
+		private void SetMovementMode(MovementStates currentState)
 		{
 			switch(currentState)
 			{
@@ -131,8 +143,6 @@ namespace Player
 				default:
 					break;
 			}
-
-			//Debug.Log("Current State: " + currentMovementState);
 		}
 
 		public MovementStates GetMovementState()
@@ -140,7 +150,7 @@ namespace Player
 			return currentMovementState;
 		}
 
-		void SetCapsule(string type)
+		private void SetCapsule(string type)
 		{
 			if (type.ToLower() == "standing")
 			{
@@ -159,10 +169,9 @@ namespace Player
 				}
 			}
 		}
-		void SetSpeed(float multiplier)
+		private void SetSpeed(float multiplier)
 		{
 			currentMovementSpeed = baseMovementSpeed * multiplier;
-			//Debug.Log("Current Speed: " + currentMovementSpeed);
 		}
 
 		public void OnMovement(Vector2 inputValue)
