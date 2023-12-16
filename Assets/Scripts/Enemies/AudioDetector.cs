@@ -138,8 +138,15 @@ public class AudioDetector : MonoBehaviour
 
 	private IEnumerator DetectorAlerted()
 	{
+		AudioSource audioSource = GetComponent<AudioSource>();
+
 		while (c_isAlerted)
 		{
+			if (audioSource != null && !audioSource.isPlaying)
+			{
+				audioSource.Play();
+			}
+
 			m_renderer.material = m_alertMaterial;
 
 			yield return new WaitForSeconds(1f);
@@ -150,6 +157,11 @@ public class AudioDetector : MonoBehaviour
 			{
 				break;
 			}
+		}
+
+		if (audioSource != null && audioSource.isPlaying)
+		{
+			audioSource.Stop();
 		}
 
 		m_renderer.material = m_passiveMaterial;

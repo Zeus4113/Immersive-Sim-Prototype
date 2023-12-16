@@ -18,7 +18,7 @@ public class VisibilityCalculator : MonoBehaviour
 	private void Start()
 	{
 		//playerRaycastCheck = GetComponentInChildren<RaycastCheck>();
-		playerTextureDetector = GetComponentInChildren<TextureDetector>();
+		//playerTextureDetector = GetComponentInChildren<TextureDetector>();
 		StartCoroutine(CalculateVisibility());
 	}
 

@@ -33,6 +33,8 @@ public class TextureDetector : MonoBehaviour
 
 			//Debug.Log(hit.collider.gameObject);
 
+			if (hit.transform.GetComponent<Renderer>() == null) yield return null;
+
 			Renderer floorRendererRef = hit.transform.GetComponent<Renderer>();
 			MeshCollider meshColliderRef = hit.collider as MeshCollider;
 

@@ -19,24 +19,35 @@ namespace Player
 
 	public class Movement : MonoBehaviour
 	{
+		[SerializeField] private PlayerInput m_playerInput;
+
 
 		// Player speed + modifier variables
+		[Header("Player Speed Variables")]
 		[SerializeField] private float baseMovementSpeed = 10f;
 		[SerializeField] private float runSpeedModifier = 1.5f;
 		[SerializeField] private float walkSpeedModifier = 0.5f;
 		[SerializeField] private float crouchWalkSpeedModifer = 0.3f;
 		[SerializeField] private float crouchSpeedModifer = 0.3f;
+		[Space(2)]
 
+		[Header("Player Rotation Sensitivity")]
 		// Player rotation sensitivity variable
 		[SerializeField] private float mouseSensitivityPlayer = 0.8f;
+		[Space(2)]
 
+
+		[Header("Player Jump Variables")]
 		// Player jump variable
 		[SerializeField] private float jumpForce = 100f;
+		[Space(2)]
 
+		[Header("Camera Variables")]
 		// Camera Settings
 		[SerializeField] private float mouseSensitivityCamera;
 		[SerializeField] private float minCameraRotation;
 		[SerializeField] private float maxCameraRotation;
+
 
 		// Movement
 		private Vector2 currentMovementValue;
@@ -64,6 +75,8 @@ namespace Player
 			playerMesh = GetComponentInChildren<MeshRenderer>();
 			playerCamera = GetComponentInChildren<Camera>();
 
+			if (m_playerInput != null) EnableInputEvents(true);
+
 			// Lock mouse cursor
 			Cursor.lockState = CursorLockMode.Locked;
 
@@ -71,21 +84,133 @@ namespace Player
 			SetMovementMode(MovementStates.normal);
 		}
 
-		private void FixedUpdate()
+		private void EnableInputEvents(bool isTrue)
 		{
-			//transform.Rotate(new Vector3(0, playerRotationValue * mouseSensitivityPlayer, 0));
-			//transform.Translate(new Vector3(currentMovementValue.x, 0, currentMovementValue.y) * currentMovementSpeed * Time.deltaTime);
-			//playerRigidbody.MovePosition(playerRigidbody.position + direction * currentMovementSpeed * Time.fixedDeltaTime);
-			//playerRigidbody.angularVelocity = new Vector3(0, playerRotationValue * mouseSensitivityPlayer, 0) * Time.fixedDeltaTime;
-			//playerRigidbody.AddForce(direction * (currentMovementSpeed / 10), ForceMode.VelocityChange);
+			if (isTrue)
+			{
+				m_playerInput.actions.FindAction("Movement").performed += StartMovement;
+				m_playerInput.actions.FindAction("Movement").canceled += StopMovement;
 
-			Vector3 direction = playerRigidbody.rotation * new Vector3(currentMovementValue.x, 0, currentMovementValue.y);
-			Vector3 velocity = direction * currentMovementSpeed * 100 * Time.fixedDeltaTime;
-			velocity.y = playerRigidbody.velocity.y;
-			playerRigidbody.velocity = velocity;
+				m_playerInput.actions.FindAction("Rotation").performed += StartRotation;
+				m_playerInput.actions.FindAction("Rotation").canceled += StopRotation;
 
-			Quaternion rotation = Quaternion.Euler(new Vector3(0, playerRotationValue * mouseSensitivityPlayer, 0) * Time.fixedDeltaTime);
-			playerRigidbody.MoveRotation(playerRigidbody.rotation * rotation);
+				m_playerInput.actions.FindAction("Jump").performed += OnJump;
+
+				m_playerInput.actions.FindAction("Crouch").performed += OnCrouch;
+				m_playerInput.actions.FindAction("Crouch").canceled += OnCrouch;
+
+				m_playerInput.actions.FindAction("Walk").performed += OnWalk;
+				m_playerInput.actions.FindAction("Walk").canceled += OnWalk;
+
+				m_playerInput.actions.FindAction("Run").performed += OnRun;
+				m_playerInput.actions.FindAction("Run").canceled += OnRun;
+			}
+			else if (!isTrue)
+			{
+				m_playerInput.actions.FindAction("Movement").performed -= StartMovement;
+				m_playerInput.actions.FindAction("Movement").canceled -= StopMovement;
+
+				m_playerInput.actions.FindAction("Rotation").performed -= StartRotation;
+				m_playerInput.actions.FindAction("Rotation").canceled -= StopRotation;
+
+				m_playerInput.actions.FindAction("Jump").performed -= OnJump;
+
+				m_playerInput.actions.FindAction("Crouch").performed -= OnCrouch;
+				m_playerInput.actions.FindAction("Crouch").canceled -= OnCrouch;
+
+				m_playerInput.actions.FindAction("Walk").performed -= OnWalk;
+				m_playerInput.actions.FindAction("Walk").canceled -= OnWalk;
+
+				m_playerInput.actions.FindAction("Run").performed -= OnRun;
+				m_playerInput.actions.FindAction("Run").canceled -= OnRun;
+			}
+		}
+
+		bool c_isMoving = false;
+		Coroutine c_moving;
+
+		void StartMovement(InputAction.CallbackContext ctx)
+		{
+			if (c_isMoving) return;
+
+			c_isMoving = true;
+
+			if (c_moving != null) return;
+
+			c_moving = StartCoroutine(Moving(ctx));
+		}
+
+		void StopMovement(InputAction.CallbackContext ctx)
+		{
+			if (!c_isMoving) return;
+
+			c_isMoving = false;
+
+			if (c_moving == null) return;
+
+			StopCoroutine(c_moving);
+			c_moving = null;
+		}
+
+		IEnumerator Moving(InputAction.CallbackContext ctx)
+		{
+			while (c_isMoving)
+			{
+				currentMovementValue = ctx.ReadValue<Vector2>();
+				Vector3 direction = playerRigidbody.rotation * new Vector3(currentMovementValue.x, 0, currentMovementValue.y);
+				Vector3 velocity = direction * currentMovementSpeed * 100 * Time.fixedDeltaTime;
+				velocity.y = playerRigidbody.velocity.y;
+				playerRigidbody.velocity = velocity;
+
+				yield return new WaitForFixedUpdate();
+			}
+
+			StopMovement(ctx);
+
+		}
+
+		bool c_isRotating = false;
+		Coroutine c_rotating;
+
+		void StartRotation(InputAction.CallbackContext ctx)
+		{
+			if (c_isRotating) return;
+
+			c_isRotating = true;
+
+			if (c_rotating != null) return;
+
+			c_rotating = StartCoroutine(Rotating(ctx));
+		}
+
+		void StopRotation(InputAction.CallbackContext ctx)
+		{
+			if (!c_isRotating) return;
+
+			c_isRotating = false;
+
+			if (c_rotating == null) return;
+
+			StopCoroutine(c_rotating);
+			c_rotating = null;
+		}
+
+		IEnumerator Rotating(InputAction.CallbackContext ctx)
+		{
+			if (c_isRotating)
+			{
+				playerRotationValue = ctx.ReadValue<Vector2>().x;
+				cameraRotationValue = ctx.ReadValue<Vector2>().y;
+
+				Quaternion rotation = Quaternion.Euler(new Vector3(0, playerRotationValue * mouseSensitivityPlayer, 0) * Time.fixedDeltaTime);
+				playerRigidbody.MoveRotation(playerRigidbody.rotation * rotation);
+
+				RotateCamera(cameraRotationValue);
+				yield return new WaitForFixedUpdate();
+			}
+
+			StopRotation(ctx);
+
 		}
 
 		public void CrouchingBlocked(bool isTrue)
@@ -105,9 +230,9 @@ namespace Player
 			playerCamera.transform.localRotation = Quaternion.Euler(clampedValue, 0, 0);
 		}
 
-		private void SetMovementMode(MovementStates currentState)
+		private void SetMovementMode(MovementStates newState)
 		{
-			switch(currentState)
+			switch(newState)
 			{
 				case MovementStates.normal:
 					SetCapsule("standing");
@@ -174,20 +299,10 @@ namespace Player
 			currentMovementSpeed = baseMovementSpeed * multiplier;
 		}
 
-		public void OnMovement(Vector2 inputValue)
+		public void OnWalk(InputAction.CallbackContext ctx)
 		{
-			currentMovementValue = inputValue;
-		}
+			bool isPressed = ctx.performed;
 
-		public void OnRotation(Vector2 inputValue)
-		{
-			playerRotationValue = inputValue.x;
-			cameraRotationValue = inputValue.y;
-			RotateCamera(cameraRotationValue);
-		}
-
-		public void OnWalk(bool isPressed)
-		{
 			if (isPressed)
 			{
 				if (currentMovementState == MovementStates.normal)
@@ -216,8 +331,10 @@ namespace Player
 			}
 		}
 
-		public void OnRun(bool isPressed)
+		public void OnRun(InputAction.CallbackContext ctx)
 		{
+			bool isPressed = ctx.performed;
+
 			if (isPressed)
 			{
 				if (currentMovementState == MovementStates.normal)
@@ -234,7 +351,7 @@ namespace Player
 			}
 		}
 
-		public void OnJump()
+		public void OnJump(InputAction.CallbackContext ctx)
 		{
 			if (isGrounded)
 			{
@@ -242,7 +359,7 @@ namespace Player
 			}
 		}
 
-		public void OnCrouch()
+		public void OnCrouch(InputAction.CallbackContext ctx)
 		{
 			if (currentMovementState == MovementStates.normal || currentMovementState == MovementStates.walking)
 			{
