@@ -7,48 +7,25 @@ namespace Enemy
 {
 	public class PassiveActions : MonoBehaviour
 	{
-		[SerializeField] private Transform m_patrolPathHolder;
-		[SerializeField] private float m_waitTime = 0.25f;
-
+		private Transform m_patrolPathHolder;
+		private float m_waitTime = 0.25f;
 		private NavMeshAgent m_agent;
 
-
-		private void Start()
+		public void Init(Transform pathHolder, float waitTime)
 		{
 			m_agent = GetComponent<NavMeshAgent>();
-		}
-		private void OnDrawGizmos()
-		{
-			Vector3 startPosition = m_patrolPathHolder.GetChild(0).position;
-			Vector3 previousPosition = startPosition;
-
-			foreach (Transform waypoint in m_patrolPathHolder)
-			{
-				Gizmos.DrawSphere(waypoint.position, .3f);
-				Gizmos.DrawLine(previousPosition, waypoint.position);
-				previousPosition = waypoint.position;
-			}
-
-			Gizmos.DrawLine(previousPosition, startPosition);
-		}
-		private Vector3[] GetWaypoints()
-		{
-			Vector3[] waypoints = new Vector3[m_patrolPathHolder.childCount];
-
-			for (int i = 0; i < waypoints.Length; i++)
-			{
-				waypoints[i] = m_patrolPathHolder.GetChild(i).position;
-			}
-
-			return waypoints;
+			m_patrolPathHolder = pathHolder;
+			m_waitTime = waitTime;
 		}
 
-		// Enemy passive behaviour
+		// Set enemy as passive
 
-		public void EnemyPassive()
+		public void Enable()
 		{
 			StartPatrol(GetWaypoints());
 		}
+
+		// Patrol Coroutine
 
 		bool c_isMoving = false;
 		Coroutine c_moving;
@@ -100,6 +77,19 @@ namespace Enemy
 			StopPatrol();
 		}
 
+		// Misc Functions
+
+		private Vector3[] GetWaypoints()
+		{
+			Vector3[] waypoints = new Vector3[m_patrolPathHolder.childCount];
+
+			for (int i = 0; i < waypoints.Length; i++)
+			{
+				waypoints[i] = m_patrolPathHolder.GetChild(i).position;
+			}
+
+			return waypoints;
+		}
 	}
 }
 

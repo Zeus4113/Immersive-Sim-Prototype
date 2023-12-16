@@ -7,23 +7,26 @@ namespace Enemy
 {
 	public class AlertActions : MonoBehaviour
 	{
-
-		[SerializeField] private Transform m_playerTransform;
-		[SerializeField] private float m_attackCooldown = 1f;
-
+		private float m_attackCooldown = 1f;
 		private NavMeshAgent m_agent;
 
-		private void Start()
+		public void Init(float cooldown)
 		{
 			m_agent = GetComponent<NavMeshAgent>();
-			StartMoving(m_playerTransform);
+			m_attackCooldown = cooldown;
 		}
 
-		bool TrackingEnemy()
+		public void StartAlerted(Transform player)
 		{
-			if (m_playerTransform == null) return false;
-			return true;
+			StartMoving(player);
 		}
+
+		public void StopAlerted()
+		{
+			StopMoving();
+		}
+
+		// Alerted Coroutine
 
 		bool c_isMoving = false;
 		Coroutine c_moving;
@@ -53,7 +56,7 @@ namespace Enemy
 
 		IEnumerator MoveToEnemy(Transform targetPosition)
 		{
-			while (c_isMoving && TrackingEnemy())
+			while (c_isMoving && targetPosition != null)
 			{
 				m_attackCooldown -= Time.fixedDeltaTime;
 				if (m_attackCooldown < 0f) m_attackCooldown = 0f;
@@ -82,6 +85,8 @@ namespace Enemy
 
 			StopMoving();
 		} 
+
+		// Attack Function
 
 		void AttackTarget(Collider other)
 		{

@@ -7,25 +7,22 @@ namespace Enemy
 {
 	public class SuspiciousActions : MonoBehaviour
 	{
-		[SerializeField] private float m_lingerTime = 0.5f;
-		[SerializeField] private Transform m_targetLocation;
+		private float m_lingerTime = 0.5f;
 
 		private NavMeshAgent m_agent;
 
-		private void Start()
+		public void Init(float lingerTime)
 		{
 			m_agent = GetComponent<NavMeshAgent>();
-			EnemySuspicious(m_targetLocation.position);
+			m_lingerTime = lingerTime;
 		}
-		public void EnemySuspicious(Vector3 target)
+
+		public void StartSuspicion(Vector3 target)
 		{
 			StartMoving(target);
 		}
-		private void OnEnable()
-		{
-			
-		}
-		private void OnDisable()
+
+		public void StopSuspicion()
 		{
 			StopMoving();
 			StopInvestigating();
@@ -46,7 +43,6 @@ namespace Enemy
 
 			c_moving = StartCoroutine(MoveToDisturbance(targetLocation));
 		}
-
 		void StopMoving()
 		{
 			if (!c_isMoving) return;
@@ -92,7 +88,6 @@ namespace Enemy
 
 			c_investigating = StartCoroutine(InvestigateArea(targetArea));
 		}
-
 		void StopInvestigating()
 		{
 			if (!c_isInvestigating) return;
@@ -108,7 +103,6 @@ namespace Enemy
 		private IEnumerator InvestigateArea(Vector3 targetArea)
 		{
 			Vector3 newPosition = targetArea + new Vector3(Random.insideUnitCircle.x * 5, targetArea.y, Random.insideUnitCircle.y * 5);
-			NavMeshHit hit;
 
 			while (c_isInvestigating)
 			{
