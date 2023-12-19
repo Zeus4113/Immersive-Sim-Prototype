@@ -15,6 +15,8 @@ public class VisibilityCalculator : MonoBehaviour
 	private TextureDetector playerTextureDetector;
 	private List<PlayerDetector> lightSources = new List<PlayerDetector>();
 
+	private float m_visibilityLevel = 0f;
+
 	private void Start()
 	{
 		//playerRaycastCheck = GetComponentInChildren<RaycastCheck>();
@@ -28,7 +30,10 @@ public class VisibilityCalculator : MonoBehaviour
 		{
 			float totalValue = DetermineTotalVisibility(DetermineRaycastVisibility(), DetermineTextureVisibility());
 
-			float indicatorOpacity = 0f;
+			m_visibilityLevel = totalValue;
+			//Debug.Log(m_visibilityLevel.ToString());
+
+            float indicatorOpacity = 0f;
 			indicatorOpacity = (totalValue / 100);
 			updateHud.Invoke(indicatorOpacity);
 
@@ -36,6 +41,12 @@ public class VisibilityCalculator : MonoBehaviour
 			yield return new WaitForSeconds(0.01f);
 		}
 	}
+
+	public float GetVisibility()
+	{
+		return m_visibilityLevel;
+
+    }
 
 	public void AddLight(PlayerDetector lightSource)
 	{

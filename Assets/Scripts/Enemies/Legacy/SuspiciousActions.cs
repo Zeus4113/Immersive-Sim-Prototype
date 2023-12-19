@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEngine.UI.Image;
 
 namespace Enemy
 {
@@ -33,15 +35,21 @@ namespace Enemy
 		bool c_isMoving = false;
 		Coroutine c_moving;
 
+		public bool IsMoving()
+		{
+			return c_isMoving;
+		}
+
 		void StartMoving(Vector3 targetLocation)
 		{
-			if (c_isMoving) return;
+            if (c_isMoving) return;
 
 			c_isMoving = true;
 
 			if (c_moving != null) return;
 
-			c_moving = StartCoroutine(MoveToDisturbance(targetLocation));
+            //Debug.Log("Moving to investigate");
+            c_moving = StartCoroutine(MoveToDisturbance(targetLocation));
 		}
 		void StopMoving()
 		{
@@ -57,20 +65,24 @@ namespace Enemy
 
 		private IEnumerator MoveToDisturbance(Vector3 targetLocation)
 		{
+			//Vector3 targetPosition = targetLocation;
+
 			while (c_isMoving)
 			{
-				m_agent.destination = targetLocation;
+				//Debug.Log("Moving to investigate" + targetLocation);
+				Debug.Log("Target Location: " + targetLocation);
+                m_agent.destination = targetLocation;
+				Debug.Log("Move to position: " +  m_agent.destination);
 
-				if(transform.position.x == targetLocation.x && transform.position.z == targetLocation.z)
+
+				if(Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(targetLocation.x, targetLocation.z)) < 0.2f)
 				{
 					StartInvestigating(targetLocation);
-					break;
-				}
-
+					StopMoving();
+                }
+  
 				yield return new WaitForFixedUpdate();
 			}
-
-			StopMoving();
 		}
 
 		// Investigating Coroutine
@@ -86,7 +98,8 @@ namespace Enemy
 
 			if (c_investigating != null) return;
 
-			c_investigating = StartCoroutine(InvestigateArea(targetArea));
+            Debug.Log("Investigating");
+            c_investigating = StartCoroutine(InvestigateArea(targetArea));
 		}
 		void StopInvestigating()
 		{
@@ -102,9 +115,9 @@ namespace Enemy
 
 		private IEnumerator InvestigateArea(Vector3 targetArea)
 		{
-			Vector3 newPosition = targetArea + new Vector3(Random.insideUnitCircle.x * 5, targetArea.y, Random.insideUnitCircle.y * 5);
+			Vector3 newPosition = GetRandomPositionInRadius(targetArea, 1);
 
-			while (c_isInvestigating)
+            while (c_isInvestigating)
 			{
 				NavMeshPath path = new NavMeshPath();
 				m_agent.CalculatePath(newPosition, path);
@@ -113,25 +126,34 @@ namespace Enemy
 
 				if(path.status == NavMeshPathStatus.PathComplete)
 				{
-					m_agent.destination = newPosition;
+                    m_agent.destination = newPosition;
 
-					Debug.Log(Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(newPosition.x, newPosition.z)));
+					//Debug.Log(Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(newPosition.x, newPosition.z)));
 
 					if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(newPosition.x, newPosition.z)) < 0.5f)
-					{
-						newPosition = targetArea + new Vector3(Random.insideUnitCircle.x * 5, targetArea.y, Random.insideUnitCircle.y * 5);
+                    {
+						newPosition = GetRandomPositionInRadius(targetArea, 1);
 
-						yield return new WaitForSeconds(m_lingerTime);
+                        Debug.Log("Waiting");
+                        yield return new WaitForSeconds(m_lingerTime);
 					}
 				}
-				else
+				else if(path.status == NavMeshPathStatus.PathInvalid)
 				{
-					newPosition = targetArea + new Vector3(Random.insideUnitCircle.x * 5, targetArea.y, Random.insideUnitCircle.y * 5);
-				}
+					newPosition = GetRandomPositionInRadius(targetArea, 1);
+                    Debug.Log("Generating New Vector3: " + newPosition);
+					//Handles.DrawSolidDisc(newPosition, Vector3.up, 1f);
+                }
 
 				yield return new WaitForFixedUpdate();
 			}
 		}
+
+		Vector3 GetRandomPositionInRadius(Vector3 origin, float radius)
+		{
+			Vector3 newPosition = origin + new Vector3((Random.insideUnitCircle.x * radius), origin.y, (Random.insideUnitCircle.y * radius));
+			return newPosition;
+        }
 	}
 }
 

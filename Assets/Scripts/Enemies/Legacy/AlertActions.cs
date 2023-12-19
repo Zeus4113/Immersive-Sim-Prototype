@@ -39,7 +39,8 @@ namespace Enemy
 
 			if (c_moving != null) return;
 
-			c_moving = StartCoroutine(MoveToEnemy(targetPosition));
+            Debug.Log("Pursuing target");
+            c_moving = StartCoroutine(MoveToEnemy(targetPosition));
 		}
 
 		void StopMoving()

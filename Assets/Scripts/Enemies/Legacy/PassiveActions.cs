@@ -18,19 +18,12 @@ namespace Enemy
 			m_waitTime = waitTime;
 		}
 
-		// Set enemy as passive
-
-		public void Enable()
-		{
-			StartPatrol(GetWaypoints());
-		}
-
 		// Patrol Coroutine
 
 		bool c_isMoving = false;
 		Coroutine c_moving;
 
-		void StartPatrol(Vector3[] waypoints)
+		public void StartPatrol()
 		{
 			if (c_isMoving) return;
 			
@@ -38,10 +31,11 @@ namespace Enemy
 
 			if (c_moving != null) return;
 
-			c_moving = StartCoroutine(FollowPatrolPath(waypoints));
+            //Debug.Log("Patrolling");
+            c_moving = StartCoroutine(FollowPatrolPath(GetWaypoints()));
 		}
 
-		void StopPatrol()
+		public void StopPatrol()
 		{
 			if (!c_isMoving) return;
 
@@ -62,7 +56,9 @@ namespace Enemy
 
 			while (c_isMoving)
 			{
-				m_agent.destination = targetWaypoint;
+                Debug.Log("Patrolling");
+                //Debug.Log("P - Moving");
+                m_agent.destination = targetWaypoint;
 
 				if(transform.position.x == targetWaypoint.x && transform.position.z == targetWaypoint.z)
 				{

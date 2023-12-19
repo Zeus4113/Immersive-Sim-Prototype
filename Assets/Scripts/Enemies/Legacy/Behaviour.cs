@@ -29,6 +29,8 @@ namespace Enemy
 		private SuspiciousActions m_suspiciousActions;
 		private PassiveActions m_passiveActions;
 
+		private GuardPerception1 m_guardPerception;
+
 		private NavMeshAgent m_navMeshAgent;
 
 		private BehaviourState m_behaviourState;
@@ -39,11 +41,13 @@ namespace Enemy
 			m_suspiciousActions = GetComponent<SuspiciousActions>();
 			m_passiveActions = GetComponent<PassiveActions>();
 			m_navMeshAgent = GetComponent<NavMeshAgent>();
+            m_guardPerception = GetComponentInChildren<GuardPerception1>();
 
-			m_behaviourState = BehaviourState.passive;
+            m_behaviourState = BehaviourState.passive;
 
 			InitialiseScripts();
 			StartThinking();
+			UpdateBehaviour(m_behaviourState);
 		}
 
 		private void OnDrawGizmos()
@@ -96,29 +100,67 @@ namespace Enemy
 			c_thinking = null;
 		}
 
+		void DetermineState(float alertLevel)
+		{
+            BehaviourState newState = BehaviourState.passive;
+
+
+            switch (alertLevel)
+			{
+                case float x when (x == 0):
+                    newState = BehaviourState.passive;
+                    break;
+                case float x when (x > 0 && x <= 100):
+                    newState = BehaviourState.suspicious;
+                    break;
+                case float x when (x > 80 && x <= 100) && m_guardPerception.GetActualTarget() != null:
+                    newState = BehaviourState.alert;
+                    break;
+			}
+
+            if (m_behaviourState != newState)
+            {
+                m_behaviourState = newState;
+
+                m_alertActions.StopAlerted();
+                m_suspiciousActions.StopSuspicion();
+                m_passiveActions.StopPatrol();
+
+                UpdateBehaviour(m_behaviourState);
+				Debug.Log("Behavior Updated: " + m_behaviourState);
+            }
+        }
+
+		void UpdateBehaviour(BehaviourState newState)
+		{
+            switch (newState)
+            {
+                case BehaviourState.passive:
+                    m_passiveActions.StartPatrol();
+                    m_navMeshAgent.speed = 1.5f;
+                    //Debug.Log("Passive");
+                break;
+
+                case BehaviourState.suspicious:
+                    m_suspiciousActions.StartSuspicion(m_guardPerception.GetLastKnownLocation());
+                    m_navMeshAgent.speed = 2f;
+                    //Debug.Log("Suspicious");
+                break;
+
+                case BehaviourState.alert:
+                    m_alertActions.StartAlerted(m_guardPerception.GetActualTarget());
+                    m_navMeshAgent.speed = 3f;
+                    //Debug.Log("Alert");
+
+                break;
+            }
+        }
+
 		IEnumerator Thinking()
 		{
 			while (c_isThinking)
 			{
-				switch (m_behaviourState)
-				{
-					case BehaviourState.passive:
-						m_passiveActions.Enable();
-						m_navMeshAgent.speed = 1.5f;
-						break;
-
-					case BehaviourState.suspicious:
-
-						m_navMeshAgent.speed = 2f;
-						break;
-
-					case BehaviourState.alert:
-
-						m_navMeshAgent.speed = 3f;
-						break;
-
-				}
-
+				DetermineState(m_guardPerception.GetAlertLevel());
 				yield return new WaitForFixedUpdate();
 			}
 
