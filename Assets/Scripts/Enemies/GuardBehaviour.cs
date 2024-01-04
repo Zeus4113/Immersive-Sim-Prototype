@@ -11,60 +11,103 @@ namespace Enemy
         alerted,
     }
 
-    public class GuardBehaviour : MonoBehaviour
+    public class GuardBehaviour : MonoBehaviour, IBehaviourable
     {
+		[SerializeField] private float m_alertFalloffModifier = 1f;
+
+		private EnemyManager m_enemyManager;
+
         private GuardActions m_actions;
         private GuardPerception m_perception;
         private float m_alertFloat;
         private Vector3 m_alertLocation;
 
-        private void Start()
+        public void Init(EnemyManager em)
         {
-            m_alertLocation = Vector3.zero;
-            m_alertFloat = 0;
+			m_enemyManager = em;
+			m_alertLocation = Vector3.zero;
+			m_alertFloat = 0f;
+			c_isThinking = false;
 
-            m_actions = GetComponent<GuardActions>();
+			m_actions = GetComponent<GuardActions>();
             m_perception = GetComponent<GuardPerception>();
             m_perception.sightAlerted += UpdateAlertLevel;
-            m_perception.StartLooking();
         }
 
-        private void FixedUpdate()
+		public void ResetBehaviour()
+		{
+			m_alertLocation = Vector3.zero;
+			m_alertFloat = 0f;
+			c_isThinking = false;
+		}
+
+		bool c_isThinking = false;
+		Coroutine c_thinking;
+
+		public void StartThinking()
+		{
+			if (c_isThinking) return;
+			c_isThinking = true;
+
+			if (c_thinking != null) return;
+			c_thinking = StartCoroutine(Thinking());
+		}
+
+		public void StopThinking()
+		{
+			if (!c_isThinking) return;
+			c_isThinking = false;
+
+			if (c_thinking == null) return;
+			StopCoroutine(c_thinking);
+			c_thinking = null;
+		}
+
+		IEnumerator Thinking()
         {
-            m_alertFloat -= (Time.deltaTime * 3);
-            m_alertFloat = Mathf.Clamp(m_alertFloat, 0, 100);
-            Debug.Log(m_alertFloat.ToString());
+			m_perception.StartLooking();
 
-            switch (DetemineAlertLevel())
-            {
-                case AlertLevel.passive:
+			while (c_isThinking)
+			{
+				switch (DetemineAlertLevel())
+				{
+					case AlertLevel.passive:
 
-                    m_actions.StartPatrolling();
+						m_actions.StartPatrolling();
 
-                    break;
+						break;
 
-                case AlertLevel.suspicious:
+					case AlertLevel.suspicious:
 
-                    if(m_alertLocation  != Vector3.zero)
-                    {
-                        m_actions.StartInvestigating(m_alertLocation);
-                    }
+						if (m_alertLocation != Vector3.zero)
+						{
+							m_actions.StartInvestigating(m_alertLocation);
+						}
 
-                    break;
+						break;
 
-                case AlertLevel.alerted:
+					case AlertLevel.alerted:
 
-                    if (m_perception.GetPlayerRef() != null)
-                    {
-                        m_actions.StartPursuing(m_perception.GetPlayerRef());
-                    }
-                    else if (m_alertLocation != Vector3.zero)
-                    {
-                        m_actions.StartInvestigating(m_alertLocation);
-                    }
+						if (m_perception.GetPlayerRef() != null)
+						{
+							m_actions.StartPursuing(m_perception.GetPlayerRef());
+						}
+						else if (m_alertLocation != Vector3.zero)
+						{
+							m_actions.StartInvestigating(m_alertLocation);
+						}
 
-                    break;
-            }
+						break;
+				}
+
+				m_alertFloat -= (Time.deltaTime * m_alertFalloffModifier);
+				m_alertFloat = Mathf.Clamp(m_alertFloat, 0, 100);
+
+				yield return new WaitForFixedUpdate();
+			}
+
+			m_perception.StopLooking();
+			StopThinking();
         }
 
         private AlertLevel DetemineAlertLevel()
@@ -84,11 +127,6 @@ namespace Enemy
                 case float x when x > 60 && x <= 100:
                     return AlertLevel.alerted;
             }
-        }
-
-        private void UpdateAlertLevel(float amount)
-        {
-            m_alertFloat += amount;
         }
 
         private void UpdateAlertLevel(float amount, Vector3 position)

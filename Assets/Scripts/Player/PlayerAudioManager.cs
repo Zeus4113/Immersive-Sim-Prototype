@@ -8,7 +8,8 @@ public class PlayerAudioManager : MonoBehaviour
 	private Rigidbody rb;
 	private AudioSource audioSource;
 	private bool isRunning;
-	private SoundEffect soundEffect;
+
+	[SerializeField] private AudioClip[] soundEffects;
 
 	private float currentVolume;
 
@@ -19,7 +20,6 @@ public class PlayerAudioManager : MonoBehaviour
 		currentVolume = 0f;
 		rb = GetComponentInParent<Rigidbody>();
 		audioSource = GetComponent<AudioSource>();
-		soundEffect = GetComponent<SoundEffect>();
 	}
 
     // Update is called once per frame
@@ -30,6 +30,11 @@ public class PlayerAudioManager : MonoBehaviour
 			StartWalkingAudio();
 		}
     }
+
+	AudioClip GetRandomClip()
+	{
+		return soundEffects[Random.Range(0, soundEffects.Length)];
+	}
 
 	bool c_isWalking = false;
 	Coroutine c_walking;
@@ -60,34 +65,37 @@ public class PlayerAudioManager : MonoBehaviour
 
 	private IEnumerator WalkingAudio()
 	{
+		float baseDelay = 0.4f;
+		float baseVolume = 0.4f;
+
 		while (c_isWalking)
 		{
-			float currentVelocity = (rb.velocity.magnitude);
+			//float currentVelocity = (rb.velocity.magnitude);
 
-			float baseDelay = 0.4f;
+			float currentVelocity = new Vector2(rb.velocity.x, rb.velocity.z).magnitude;
 
 			switch (currentVelocity)
 			{
 				case <= 5f and > 3.51f:
-					currentVolume = 0.35f;
+					currentVolume = baseVolume * 1.25f;
 					PlayAudio();
 					yield return new WaitForSeconds(baseDelay / 1.25f);
 					break;
 
 				case <= 3.51f and > 2.625f:
-					currentVolume = 0.3f;
+					currentVolume = baseVolume * 1;
 					PlayAudio();
 					yield return new WaitForSeconds(baseDelay / 1);
 					break;
 
 				case <= 2.625f and > 1.75f:
-					currentVolume = 0.25f;
+					currentVolume = baseVolume * 0.75f;
 					PlayAudio();
 					yield return new WaitForSeconds(baseDelay / 0.75f);
 					break;
 
 				case <= 1.75f and > 0.875f:
-					currentVolume = 0.2f;
+					currentVolume = baseVolume * 0.5f;
 					PlayAudio();
 					yield return new WaitForSeconds(baseDelay / 0.5f);
 					break;
@@ -103,6 +111,7 @@ public class PlayerAudioManager : MonoBehaviour
 	public void PlayAudio()
 	{
 		audioSource.volume = currentVolume;
+		audioSource.clip = GetRandomClip();
 		audioSource.Play();
 		//soundEffect.OnPlayed(volume);
 	}

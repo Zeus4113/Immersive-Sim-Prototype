@@ -78,10 +78,11 @@ public class RaycastCheck : MonoBehaviour
 	{
 		float hitCount = 0f;
 
+		// Check Sensors
+
 		for (int i = 0; i < sensorCount; i++)
 		{
-			RaycastHit hit = new RaycastHit();
-			LayerMask mask = LayerMask.GetMask("Player", "Environment");
+			RaycastHit hit;
 			Physics.Raycast(lightSource.position, (raycastOrigins[i].position - lightSource.position).normalized, out hit);
 			Debug.DrawLine(lightSource.position, raycastOrigins[i].position, Color.red, 0.1f);
 
@@ -91,21 +92,30 @@ public class RaycastCheck : MonoBehaviour
 			}
 		}
 
-		float currentVisbility = (hitCount / sensorCount);
+		// Get Values
+
+		float currentVisbility = hitCount;
+
 		float distance = Vector3.Distance(transform.position, lightSource.position);
+
 		float intensity = lightSource.GetComponentInChildren<Light>().intensity;
+
+		// Light Types
 
 		if (lightSource.GetComponentInChildren<Light>().type == LightType.Point)
 		{
-			distance = distance * distance;
-			intensity = intensity / distance;
+			//float squareDistance = distance * distance;
 
-			currentVisbility = (currentVisbility * intensity);
-			//Debug.Log(currentVisbility);
+			float inverseSquareIntensity = intensity / distance;
+
+			currentVisbility = (currentVisbility * inverseSquareIntensity);
 		}
+
 		else if(lightSource.GetComponentInChildren<Light>().type == LightType.Spot)
 		{
-			currentVisbility = currentVisbility * intensity;
+			float inverseSquareIntensity = intensity / distance;
+
+			currentVisbility = currentVisbility * inverseSquareIntensity;
 		}
 
 		return currentVisbility;

@@ -19,8 +19,8 @@ namespace Player
 
 	public class Movement : MonoBehaviour
 	{
-		[SerializeField] private PlayerInput m_playerInput;
-
+		private PlayerInput m_playerInput;
+		private Player.Controller m_controller;
 
 		// Player speed + modifier variables
 		[Header("Player Speed Variables")]
@@ -67,8 +67,13 @@ namespace Player
 		private bool crouchingBlocked;
 		private bool isGrounded;
 
-		private void Start()
+
+
+		public void Init(PlayerInput playerInput, Player.Controller controller)
 		{
+			m_playerInput = playerInput;
+			m_controller = controller;
+
 			// Grab Components
 			playerCollider = GetComponent<Collider>();
 			playerRigidbody = GetComponent<Rigidbody>();
@@ -150,6 +155,8 @@ namespace Player
 
 			StopCoroutine(c_moving);
 			c_moving = null;
+
+			StartDampening();
 		}
 
 		IEnumerator Moving(InputAction.CallbackContext ctx)
@@ -167,6 +174,49 @@ namespace Player
 
 			StopMovement(ctx);
 
+		}
+
+		bool c_isDampening = false;
+		Coroutine c_dampening;
+
+		void StartDampening()
+		{
+			if (c_isDampening) return;
+
+			c_isDampening = true;
+
+			if (c_dampening != null) return;
+
+			c_dampening = StartCoroutine(Dampening());
+		}
+
+		void StopDampening()
+		{
+			if (!c_isDampening) return;
+
+			c_isDampening = false;
+
+			if (c_dampening == null) return;
+
+			StopCoroutine(c_dampening);
+			c_dampening = null;
+		}
+
+		IEnumerator Dampening()
+		{
+			while (c_isDampening)
+			{
+				playerRigidbody.velocity = new Vector3(playerRigidbody.velocity.x * 0.9f, playerRigidbody.velocity.y, playerRigidbody.velocity.z * 0.9f);
+
+				if (playerRigidbody.velocity.magnitude < 0.1f)
+				{
+					break;
+				}
+
+				yield return new WaitForFixedUpdate();
+			}
+
+			StopDampening();
 		}
 
 		bool c_isRotating = false;

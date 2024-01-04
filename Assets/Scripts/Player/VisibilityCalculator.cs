@@ -6,37 +6,38 @@ using UnityEngine.Events;
 
 public class VisibilityCalculator : MonoBehaviour
 {
+	private Player.Controller m_controller;
+
 	[SerializeField] private float raycastWeighting = 1f;
-	[SerializeField] private float textureWeighting = 1f;
+	[SerializeField] private float speedWeighting = 1f;
 
 	[SerializeField] private floatEvent updateHud;
 
 	private RaycastCheck playerRaycastCheck;
+	private Rigidbody m_rb;
+
 	private TextureDetector playerTextureDetector;
 	private List<PlayerDetector> lightSources = new List<PlayerDetector>();
 
 	private float m_visibilityLevel = 0f;
 
-	private void Start()
+	public void Init(Player.Controller controller)
 	{
-		//playerRaycastCheck = GetComponentInChildren<RaycastCheck>();
-		//playerTextureDetector = GetComponentInChildren<TextureDetector>();
+		m_controller = controller;
+		m_rb = GetComponent<Rigidbody>();
+
 		StartCoroutine(CalculateVisibility());
 	}
 
 	private IEnumerator CalculateVisibility()
 	{
+		float velocity;
+
 		while (true)
 		{
-			float totalValue = DetermineTotalVisibility(DetermineRaycastVisibility(), DetermineTextureVisibility());
-
-			m_visibilityLevel = totalValue;
-			//Debug.Log(m_visibilityLevel.ToString());
-
-            float indicatorOpacity = 0f;
-			indicatorOpacity = (totalValue / 100);
-			updateHud.Invoke(indicatorOpacity);
-
+			velocity = m_rb.velocity.magnitude;
+			m_visibilityLevel = DetermineTotalVisibility(DetermineRaycastVisibility(), velocity);
+			updateHud.Invoke(m_visibilityLevel / 100);
 
 			yield return new WaitForSeconds(0.01f);
 		}
@@ -58,12 +59,12 @@ public class VisibilityCalculator : MonoBehaviour
 		lightSources.Remove(lightSource);
 	}
 
-	private float DetermineTotalVisibility(float raycastVisibility, float textureVisibility)
+	private float DetermineTotalVisibility(float raycastVisibility, float rigidbodySpeed)
 	{
 		float totalVisibility = 0;
 
 		totalVisibility += (raycastVisibility * raycastWeighting);
-		totalVisibility += (textureVisibility * textureWeighting);
+		totalVisibility += (rigidbodySpeed * speedWeighting);
 
 		totalVisibility = Mathf.Clamp(totalVisibility, 0, 100);
 
@@ -84,25 +85,8 @@ public class VisibilityCalculator : MonoBehaviour
 				visibilityTotal += lightSources[i].GetPlayerVisibility();
 			}
 
-			//Debug.Log(lightSources.Count);
-
-			visibilityTotal = visibilityTotal / lightSources.Count;
-
 			visibilityTotal = Mathf.Round(Mathf.Clamp((visibilityTotal) * 100, 0, 100));
 		}
-
-		return visibilityTotal;
-	}
-
-	private float DetermineTextureVisibility()
-	{
-		if (playerTextureDetector == null) return 0;
-
-		float visibilityTotal = 0f;
-
-		visibilityTotal += playerTextureDetector.GetVisibility();
-
-		visibilityTotal = Mathf.Round(Mathf.Clamp((visibilityTotal) * 100, 0, 100));
 
 		return visibilityTotal;
 	}

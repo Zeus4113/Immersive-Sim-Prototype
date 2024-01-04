@@ -8,9 +8,10 @@ using static UnityEngine.GraphicsBuffer;
 
 namespace Enemy
 {
-    public class GuardPerception : MonoBehaviour
+	public delegate void Disturbance(float amount, Vector3 position);
+
+	public class GuardPerception : MonoBehaviour
     {
-        public delegate void Disturbance(float amount, Vector3 position);
         public event Disturbance sightAlerted;
 
         [Header("Field-of-View Variables")]
