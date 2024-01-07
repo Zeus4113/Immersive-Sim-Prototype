@@ -34,20 +34,52 @@ public class CheckpointManager : MonoBehaviour, IInteractable
 			}
 		}
 
-		ResetPlayer();
+        StartReseting();
 	}
 
-	void ResetPlayer()
+	bool c_isReseting;
+	Coroutine c_reseting;
+
+	void StartReseting()
 	{
-		if (m_activeCheckpoint != null)
+		if (c_isReseting) return;
+		c_isReseting = true;
+
+		if (c_reseting != null) return;
+		c_reseting = StartCoroutine(ResetPlayer());
+	}
+
+	void StopReseting()
+    {
+        if (!c_isReseting) return;
+        c_isReseting = false;
+
+        if (c_reseting == null) return;
+        StopCoroutine(c_reseting);
+		c_reseting = null;
+
+    }
+
+	IEnumerator ResetPlayer()
+	{
+		while (c_isReseting)
 		{
-			GameObject player = m_gameManager.GetController().gameObject;
+            yield return new WaitForSeconds(2f);
 
-			player.transform.position = m_activeCheckpoint.transform.position;
-			player.transform.rotation = m_activeCheckpoint.transform.rotation;
+            if (m_activeCheckpoint != null)
+            {
+                GameObject player = m_gameManager.GetController().gameObject;
 
-			resetCheckpoint?.Invoke();
-		}
+                player.transform.position = m_activeCheckpoint.transform.position;
+                player.transform.rotation = m_activeCheckpoint.transform.rotation;
+
+                resetCheckpoint?.Invoke();
+				break;
+            }
+        }
+
+		StopReseting();
+
 	}
 
 

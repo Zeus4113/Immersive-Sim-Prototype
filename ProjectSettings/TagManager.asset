@@ -6,6 +6,11 @@ TagManager:
   tags:
   - Enemy
   - Sound Detector
+  - Stone Floor
+  - Tile
+  - Wood
+  - Carpet
+  - Floor
   layers:
   - Default
   - TransparentFX

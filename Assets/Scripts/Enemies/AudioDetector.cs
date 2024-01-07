@@ -1,14 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Unity.VisualScripting.Member;
 
-public class AudioDetector : MonoBehaviour
+public class AudioDetector : MonoBehaviour, IBehaviourable
 {
+	private EnemyManager m_enemyManager;
 	private List<AudioSource> m_sourcesInRange;
+
+	[SerializeField] private GameObject[] m_triggerables;
+
 
 	[Header("Detector Variables")]
 	[SerializeField] private float m_threshold = 0.5f;
 	[SerializeField] private float m_detectorResetTime = 5f;
+	[SerializeField] private bool m_hasFalloff = true;
 	[Space(2)]
 
 	[Header("Mesh Materials")]
@@ -16,19 +22,34 @@ public class AudioDetector : MonoBehaviour
 	[SerializeField] private Material m_alertMaterial;
 	[Space(2)]
 
+	[Header("Audio Clips")]
+	[SerializeField] private AudioClip m_alertSound;
+
 	private MeshRenderer m_renderer;
 	private float m_detectorTime;
+	private AudioSource m_source;
 
 
 	// Monobehaviour Functions
 
-	private void Start()
+	public void Init(EnemyManager em)
 	{
-		m_sourcesInRange = new List<AudioSource>();
+		m_enemyManager = em;
+
+        m_sourcesInRange = new List<AudioSource>();
 		m_renderer = GetComponent<MeshRenderer>();
-		m_detectorTime = m_detectorResetTime;
-		m_renderer.material = m_passiveMaterial;
+        m_source = GetComponent<AudioSource>();
+
+		ResetBehaviour();
 	}
+
+	public void ResetBehaviour()
+	{
+        m_detectorTime = m_detectorResetTime;
+        m_renderer.material = m_passiveMaterial;
+        StopDetectorAlerted();
+		StopThinking();
+    }
 
 	private void OnTriggerEnter(Collider collision)
 	{
@@ -39,7 +60,7 @@ public class AudioDetector : MonoBehaviour
 		Debug.Log("Detected:" + gameObject.name);
 
 		m_sourcesInRange.Add(collision.GetComponentInChildren<AudioSource>());
-		StartCheckingSources();
+        StartThinking();
 	}
 
 	private void OnTriggerExit(Collider other)
@@ -59,7 +80,7 @@ public class AudioDetector : MonoBehaviour
 	bool c_isChecking = false;
 	Coroutine c_checking;
 
-	public void StartCheckingSources()
+	public void StartThinking()
 	{
 		if (c_isChecking) return;
 
@@ -70,7 +91,7 @@ public class AudioDetector : MonoBehaviour
 		c_checking = StartCoroutine(CheckSources());
 	}
 
-	public void StopCheckingSources()
+	public void StopThinking()
 	{
 		if (!c_isChecking) return;
 
@@ -93,17 +114,30 @@ public class AudioDetector : MonoBehaviour
 				if (source.isPlaying)
 				{
 					float sourceVolume = source.volume;
-					Debug.Log(sourceVolume);
+					float distance = Vector3.Distance(transform.position, source.transform.position);
+
+					if(m_hasFalloff)
+					{
+						sourceVolume = sourceVolume / distance;
+                    }
+
+					if (source.GetComponent<PlayerAudioManager>())
+					{
+						float modifer = source.GetComponent<PlayerAudioManager>().GetModifier();
+						sourceVolume =  sourceVolume * modifer;
+                    }
 
 					if (sourceVolume > m_threshold)
 					{
 						StartDetectorAlerted();
 					}
+
+					Debug.Log("Volume: " + sourceVolume);
 				}
 			}
 			yield return new WaitForFixedUpdate();
 		}
-		StopCheckingSources();
+		StopThinking();
 	}
 
 	// Detector Alerted Coroutine
@@ -122,7 +156,9 @@ public class AudioDetector : MonoBehaviour
 		if (c_alerted != null) return;
 
 		c_alerted = StartCoroutine(DetectorAlerted());
-	}
+        m_source.Play();
+
+    }
 
 	private void StopDetectorAlerted()
 	{
@@ -134,13 +170,21 @@ public class AudioDetector : MonoBehaviour
 
 		StopCoroutine(c_alerted);
 		c_alerted = null;
-	}
+        m_source.Stop();
+
+    }
 
 	private IEnumerator DetectorAlerted()
 	{
 		AudioSource audioSource = GetComponent<AudioSource>();
 
-		while (c_isAlerted)
+        for(int i = 0; i < m_triggerables.Length; i++)
+		{
+			m_triggerables[i].GetComponent<IInteractable>().Interact();
+		}
+
+
+        while (c_isAlerted)
 		{
 			if (audioSource != null && !audioSource.isPlaying)
 			{

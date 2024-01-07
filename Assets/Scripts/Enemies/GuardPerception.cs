@@ -122,10 +122,11 @@ namespace Enemy
 
         IEnumerator PlayerRefDecay()
         {
+            Debug.LogWarning("Decay Started");
             while(c_isDecaying)
             {
 
-                yield return new WaitForSeconds(2);
+                yield return new WaitForSeconds(5);
 
                 Debug.LogWarning("Transform Decayed");
                 sightAlerted?.Invoke(0, m_playerRef.position);

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Enemy
 {
@@ -14,8 +15,11 @@ namespace Enemy
     public class GuardBehaviour : MonoBehaviour, IBehaviourable
     {
 		[SerializeField] private float m_alertFalloffModifier = 1f;
+		[SerializeField] private float m_attackRange = 5f;
+		[SerializeField] private float m_attackCooldown = 5f;
 
 		private EnemyManager m_enemyManager;
+		private NavMeshAgent m_agent;
 
         private GuardActions m_actions;
         private GuardPerception m_perception;
@@ -24,12 +28,15 @@ namespace Enemy
 
         public void Init(EnemyManager em)
         {
+			Debug.Log(gameObject.name + " Initialised");
+
 			m_enemyManager = em;
 			m_alertLocation = Vector3.zero;
 			m_alertFloat = 0f;
 			c_isThinking = false;
 
-			m_actions = GetComponent<GuardActions>();
+            m_agent = GetComponent<NavMeshAgent>();
+            m_actions = GetComponent<GuardActions>();
             m_perception = GetComponent<GuardPerception>();
             m_perception.sightAlerted += UpdateAlertLevel;
         }
@@ -65,19 +72,25 @@ namespace Enemy
 
 		IEnumerator Thinking()
         {
+			float attackCooldown = 0f;
 			m_perception.StartLooking();
 
 			while (c_isThinking)
 			{
-				switch (DetemineAlertLevel())
+				m_agent.isStopped = false;
+
+                switch (DetemineAlertLevel())
 				{
 					case AlertLevel.passive:
 
-						m_actions.StartPatrolling();
+                        m_agent.speed = 2f;
+                        m_actions.StartPatrolling();
 
 						break;
 
 					case AlertLevel.suspicious:
+
+						m_agent.speed = 2.5f;
 
 						if (m_alertLocation != Vector3.zero)
 						{
@@ -88,10 +101,21 @@ namespace Enemy
 
 					case AlertLevel.alerted:
 
-						if (m_perception.GetPlayerRef() != null)
+                        m_agent.speed = 3f;
+
+                        if (m_perception.GetPlayerRef() != null)
 						{
 							m_actions.StartPursuing(m_perception.GetPlayerRef());
-						}
+
+                            if (Vector3.Distance(m_perception.GetPlayerRef().position, transform.position) < m_attackRange && attackCooldown <= 0)
+							{
+								m_agent.isStopped = true;
+                                m_actions.Attack(m_perception.GetPlayerRef());
+								attackCooldown = m_attackCooldown;
+							}
+
+
+                        }
 						else if (m_alertLocation != Vector3.zero)
 						{
 							m_actions.StartInvestigating(m_alertLocation);
@@ -100,8 +124,13 @@ namespace Enemy
 						break;
 				}
 
-				m_alertFloat -= (Time.deltaTime * m_alertFalloffModifier);
+				m_alertFloat -= (Time.fixedDeltaTime * m_alertFalloffModifier);
 				m_alertFloat = Mathf.Clamp(m_alertFloat, 0, 100);
+
+				if(attackCooldown > 0)
+				{
+                    attackCooldown -= Time.fixedDeltaTime;
+                }
 
 				yield return new WaitForFixedUpdate();
 			}
@@ -112,7 +141,7 @@ namespace Enemy
 
         private AlertLevel DetemineAlertLevel()
         {
-            //Debug.Log("Alert Level: " + Mathf.Round(m_alertFloat));
+            Debug.Log(gameObject.name + " Alert Level: " + Mathf.Round(m_alertFloat));
             switch (m_alertFloat)
             {
                 default:

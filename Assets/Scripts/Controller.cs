@@ -10,6 +10,7 @@ namespace Player
 		[SerializeField] private Movement m_movement;
 		[SerializeField] private VisibilityCalculator m_visibilityCalculator;
 		[SerializeField] private Interaction m_interact;
+		[SerializeField] private HealthComponent m_healthComponent;
 
 		private PlayerInput m_input;
 		private GameManager m_gameManager;
@@ -47,6 +48,11 @@ namespace Player
 		public GameManager GetManager()
 		{
 			return m_gameManager;
+		}
+
+		public HealthComponent GetHealthComponent()
+		{
+			return m_healthComponent;
 		}
 	}
 }

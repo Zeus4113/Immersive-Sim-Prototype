@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerAudioManager : MonoBehaviour
@@ -9,9 +10,15 @@ public class PlayerAudioManager : MonoBehaviour
 	private AudioSource audioSource;
 	private bool isRunning;
 
-	[SerializeField] private AudioClip[] soundEffects;
+	[SerializeField] private GroundedChecker m_detectionTrigger;
 
-	private float currentVolume;
+	[SerializeField] private AudioClip[] m_floorSoundEffects;
+    [SerializeField] private AudioClip[] m_tileSoundEffects;
+    [SerializeField] private AudioClip[] m_carpetSoundEffects;
+    [SerializeField] private AudioClip[] m_woodSoundEffects;
+
+    private float currentVolume;
+	private float m_volumeModifier = 1f;
 
     // Start is called before the first frame update
     void Start()
@@ -33,7 +40,31 @@ public class PlayerAudioManager : MonoBehaviour
 
 	AudioClip GetRandomClip()
 	{
-		return soundEffects[Random.Range(0, soundEffects.Length)];
+		switch (m_detectionTrigger.GetTag())
+		{
+			case "Floor":
+				m_volumeModifier = 1f;
+
+                return m_floorSoundEffects[Random.Range(0, m_floorSoundEffects.Length)];
+
+            case "Tile":
+				m_volumeModifier = 2f;
+
+                return m_tileSoundEffects[Random.Range(0, m_tileSoundEffects.Length)];
+
+            case "Wood":
+                m_volumeModifier = 0.8f;
+
+                return m_woodSoundEffects[Random.Range(0, m_woodSoundEffects.Length)];
+
+            case "Carpet":
+                m_volumeModifier = 0.5f;
+
+                return m_carpetSoundEffects[Random.Range(0, m_carpetSoundEffects.Length)];
+
+			default:
+				return null;
+        }
 	}
 
 	bool c_isWalking = false;
@@ -114,5 +145,10 @@ public class PlayerAudioManager : MonoBehaviour
 		audioSource.clip = GetRandomClip();
 		audioSource.Play();
 		//soundEffect.OnPlayed(volume);
+	}
+
+	public float GetModifier()
+	{
+		return m_volumeModifier;
 	}
 }

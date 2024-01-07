@@ -17,6 +17,8 @@ namespace Enemy
         [Header("Floats")]
         [SerializeField] private float m_patrolWaitTime;
         [SerializeField] private float m_investigatingWaitTime;
+        [SerializeField] private float m_attackDistance;
+        [SerializeField] private float m_attackDamage;
 
         bool c_isPatrolling = false;
         Coroutine c_patrolling;
@@ -208,6 +210,23 @@ namespace Enemy
                 }
             }
             return randomPoints;
+        }
+
+        public void Attack(Transform target)
+        {
+            LayerMask mask = LayerMask.GetMask("Environment", "Player");
+
+            RaycastHit hit;
+            Physics.Raycast(transform.position, target.position - transform.position, out hit, m_attackDistance, mask);
+
+            if (hit.collider == null) return;
+
+            HealthComponent health = hit.collider.GetComponent<HealthComponent>();
+
+            if(health != null)
+            {
+                health.Damage(m_attackDamage);
+            }
         }
     }
 }

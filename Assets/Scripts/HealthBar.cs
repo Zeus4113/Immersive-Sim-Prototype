@@ -11,7 +11,7 @@ public class HealthBar : MonoBehaviour
 		m_TextMeshPro = GetComponentInChildren<TMPro.TextMeshProUGUI>();
 	}
 
-	public void SetText(int amount)
+	public void SetText(float amount)
 	{
 		m_TextMeshPro.text = amount.ToString();
 	}
