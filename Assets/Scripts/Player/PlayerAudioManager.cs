@@ -2,9 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using Player;
 
 public class PlayerAudioManager : MonoBehaviour
 {
+	private Movement m_movementComponent;
+	private Controller m_playerController;
+
 	[SerializeField] private AudioClip walkSound;
 	private Rigidbody rb;
 	private AudioSource audioSource;
@@ -17,26 +21,23 @@ public class PlayerAudioManager : MonoBehaviour
     [SerializeField] private AudioClip[] m_carpetSoundEffects;
     [SerializeField] private AudioClip[] m_woodSoundEffects;
 
-    private float currentVolume;
 	private float m_volumeModifier = 1f;
 
-    // Start is called before the first frame update
-    void Start()
+	[SerializeField] float m_baseDelay = 0.4f;
+	[SerializeField] float m_baseVolume = 0.4f;
+
+	// Start is called before the first frame update
+	public void Init(Movement movement, Controller controller)
     {
+		m_movementComponent = movement;
+		m_playerController = controller;
+
 		isRunning = false;
-		currentVolume = 0f;
 		rb = GetComponentInParent<Rigidbody>();
 		audioSource = GetComponent<AudioSource>();
-	}
 
-    // Update is called once per frame
-    void FixedUpdate()
-    {
-		if(rb.velocity.magnitude > 0.875f)
-		{
-			StartWalkingAudio();
-		}
-    }
+		StartWalkingAudio();
+	}
 
 	AudioClip GetRandomClip()
 	{
@@ -96,55 +97,114 @@ public class PlayerAudioManager : MonoBehaviour
 
 	private IEnumerator WalkingAudio()
 	{
-		float baseDelay = 0.4f;
-		float baseVolume = 0.4f;
 
 		while (c_isWalking)
 		{
 			//float currentVelocity = (rb.velocity.magnitude);
+			//float currentVelocity = new Vector2(rb.velocity.x, rb.velocity.z).magnitude;
 
-			float currentVelocity = new Vector2(rb.velocity.x, rb.velocity.z).magnitude;
+			MovementStates currentState = m_movementComponent.GetMovementState();
 
-			switch (currentVelocity)
+			float delay = m_baseDelay;
+			float volume = m_baseVolume;
+
+			switch (currentState)
 			{
-				case <= 5f and > 3.51f:
-					currentVolume = baseVolume * 1.25f;
-					PlayAudio();
-					yield return new WaitForSeconds(baseDelay / 1.25f);
+
+				case MovementStates.normal:
+
+					volume = volume * 1f;
+					delay = delay / 1f;
+					PlayAudio(volume);
+
 					break;
 
-				case <= 3.51f and > 2.625f:
-					currentVolume = baseVolume * 1;
-					PlayAudio();
-					yield return new WaitForSeconds(baseDelay / 1);
+				case MovementStates.running:
+
+					volume = volume * 1.5f;
+					delay = delay / 1.5f;
+					PlayAudio(volume);
+
 					break;
 
-				case <= 2.625f and > 1.75f:
-					currentVolume = baseVolume * 0.75f;
-					PlayAudio();
-					yield return new WaitForSeconds(baseDelay / 0.75f);
+				case MovementStates.walking:
+
+					volume = volume * 0.5f;
+					delay = delay / 0.5f;
+					PlayAudio(volume);
+
 					break;
 
-				case <= 1.75f and > 0.875f:
-					currentVolume = baseVolume * 0.5f;
-					PlayAudio();
-					yield return new WaitForSeconds(baseDelay / 0.5f);
+				case MovementStates.crouched:
+
+					volume = volume * 0.75f;
+					delay = delay / 0.75f;
+					PlayAudio(volume);
+
+					break;
+
+				case MovementStates.crouchedWalking:
+
+					volume = volume * 0.25f;
+					delay = delay / 0.25f;
+					PlayAudio(volume);
+
 					break;
 
 				default:
-					currentVolume = 0f;
-					StopWalkingAudio();
+
+					volume = volume * 0f;
+					delay = delay / 0f;
+					PlayAudio(volume);
+
 					break;
+
 			}
+
+			yield return new WaitForSeconds(delay);
+
+			//switch (currentVelocity)
+			//{
+			//	case <= 7f and > 3.51f:
+			//		currentVolume = m_baseVolume * 1.5f;
+			//		PlayAudio();
+			//		yield return new WaitForSeconds(m_baseDelay / 1.5f);
+			//		break;
+
+			//	case <= 3.51f and > 2.625f:
+			//		currentVolume = m_baseVolume * 1;
+			//		PlayAudio();
+			//		yield return new WaitForSeconds(m_baseDelay / 1);
+			//		break;
+
+			//	case <= 2.625f and > 1.75f:
+			//		currentVolume = m_baseVolume * 0.5f;
+			//		PlayAudio();
+			//		yield return new WaitForSeconds(m_baseDelay / 0.5f);
+			//		break;
+
+			//	case <= 1.75f and > 0.875f:
+			//		currentVolume = m_baseVolume * 0.25f;
+			//		PlayAudio();
+			//		yield return new WaitForSeconds(m_baseDelay / 0.25f);
+			//		break;
+
+			//	default:
+			//		currentVolume = 0f;
+			//		StopWalkingAudio();
+			//		break;
+			//}
 		}
 	}
 
-	public void PlayAudio()
+	public void PlayAudio(float volume)
 	{
-		audioSource.volume = currentVolume;
-		audioSource.clip = GetRandomClip();
-		audioSource.Play();
-		//soundEffect.OnPlayed(volume);
+		if (m_detectionTrigger.IsGrounded() && rb.velocity.magnitude > 0.1f)
+		{
+			audioSource.volume = volume;
+			audioSource.clip = GetRandomClip();
+			audioSource.Play();
+		}
 	}
 
 	public float GetModifier()

@@ -65,6 +65,12 @@ public class GroundedChecker : MonoBehaviour
 
 	List<Collider> m_colliders = new List<Collider>();
 
+	public bool IsGrounded()
+	{
+		if (m_colliders.Count > 0) return true;
+		return false;
+	}
+
 	private void OnTriggerExit(Collider other)
 	{
         if (other.gameObject.layer == 3)

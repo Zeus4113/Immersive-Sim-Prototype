@@ -11,6 +11,7 @@ namespace Player
 		[SerializeField] private VisibilityCalculator m_visibilityCalculator;
 		[SerializeField] private Interaction m_interact;
 		[SerializeField] private HealthComponent m_healthComponent;
+		[SerializeField] private PlayerAudioManager m_audioManager;
 
 		private PlayerInput m_input;
 		private GameManager m_gameManager;
@@ -28,6 +29,7 @@ namespace Player
 			m_movement.Init(m_input, this);
 			m_visibilityCalculator.Init(this);
 			m_interact.Init(m_input, this);
+			m_audioManager.Init(m_movement, this);
 		}
 
 		public Movement GetMovement()
@@ -53,6 +55,11 @@ namespace Player
 		public HealthComponent GetHealthComponent()
 		{
 			return m_healthComponent;
+		}
+
+		public PlayerAudioManager GetAudioManager()
+		{
+			return m_audioManager;
 		}
 	}
 }
