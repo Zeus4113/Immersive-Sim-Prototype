@@ -67,6 +67,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Tool Menu",
+                    "type": "Button",
+                    "id": "9e61b1a0-5516-44e1-994a-ed345b9106f6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -232,6 +241,17 @@
                     "processors": "",
                     "groups": "Keyboard & Mouse",
                     "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4195113e-3c60-4f66-88eb-47038930116f",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "Hold",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Tool Menu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

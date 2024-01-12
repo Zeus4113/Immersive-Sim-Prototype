@@ -33,7 +33,9 @@ public class UIManager : MonoBehaviour
 		m_interactIcon.ToggleInteract(false);
 
 
-		m_gameManager.GetController().GetInteract().IsPresent += m_interactIcon.ToggleInteract;
+		//m_gameManager.GetController().GetInteract().IsPresent += m_interactIcon.ToggleInteract;
+
+		m_gameManager.GetController().GetInteract().UpdateIcon += m_interactIcon.SetIcon;
 		m_gameManager.GetLootManager().ScoreIncrease += m_missionScore.SetText;
 		m_gameManager.GetController().GetHealthComponent().healthChange += m_healthBar.SetText;
 	}

@@ -12,6 +12,10 @@ namespace Enemy
 
 		private EnemyManager m_enemyManager;
 
+		[SerializeField] private PerceptionDataScriptableObject m_perceptionData;
+
+		[Space(2)]
+
 		[Header("Float Variables")]
 
 		[SerializeField] private float m_suspicionThreshold = 33;
@@ -28,9 +32,8 @@ namespace Enemy
 		[Space(2)]
 
 		[Header("Components")]
-
-		[SerializeField] private CameraPerception m_perception;
 		[SerializeField] private CameraActions m_actions;
+		[SerializeField] private Perception m_perception;
 
 		[Space(2)]
 
@@ -44,8 +47,8 @@ namespace Enemy
 
 			if (m_perception != null)
 			{
-				m_perception.Init(this, m_updateTime);
-				m_perception.sightAlerted += UpdateAlertLevel;
+				m_perception.Init(m_perceptionData, m_updateTime);
+				m_perception.perceptionAlerted += UpdateAlertLevel;
 			}
 
 			if (m_actions != null)
@@ -88,10 +91,6 @@ namespace Enemy
 		{
 			while (c_isThinking)
 			{
-				if (m_perception.CanSeePlayer() && m_alertFloat > m_suspicionThreshold)
-				{
-					m_actions.PlaySound();
-				}
 
 				switch (DetermineAlertLevel())
 				{
@@ -120,8 +119,6 @@ namespace Enemy
 			StopThinking();
 		}
 
-
-
 		void UpdateAlertLevel(float amount, Vector3 position)
 		{
 			m_alertFloat += amount;
@@ -130,7 +127,7 @@ namespace Enemy
 
 		private AlertLevel DetermineAlertLevel()
 		{
-			Debug.Log(m_alertFloat);
+			//Debug.Log(m_alertFloat);
 			switch (m_alertFloat)
 			{
 				case float x when x >= 0 && x < m_suspicionThreshold:

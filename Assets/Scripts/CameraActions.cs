@@ -7,15 +7,17 @@ namespace Enemy
 	public class CameraActions : MonoBehaviour
 	{
 		private CameraBehaviour m_behaviour;
-
 		private MeshRenderer m_lightRenderer;
 		private AudioSource m_audioSource;
 		private Light m_pointLight;
 
+		[Header("Materials")]
 		[SerializeField] private Material m_yellowEmissive;
 		[SerializeField] private Material m_redEmissive;
 		[SerializeField] private Material m_greenEmissive;
+		[Space(2)]
 
+		[Header("Sounds")]
 		[SerializeField] private AudioClip m_suspiciousSound;
 		[SerializeField] private AudioClip m_alertedSound;
 

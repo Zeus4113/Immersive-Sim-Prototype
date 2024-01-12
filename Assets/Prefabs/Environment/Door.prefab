@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4784474513595170488}
   - component: {fileID: 4278899238603380732}
   - component: {fileID: 3953112149745874131}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -114,7 +114,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3304553207473415013}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Door Frame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -151,7 +151,7 @@ GameObject:
   - component: {fileID: 3868415948845519654}
   - component: {fileID: 7186267554901150909}
   - component: {fileID: 707683670059740467}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -256,7 +256,7 @@ GameObject:
   - component: {fileID: 6505109540019021321}
   - component: {fileID: 4677871759811621157}
   - component: {fileID: 2889262029988078950}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -362,7 +362,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 375185122026040891}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Hinge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -400,7 +400,7 @@ GameObject:
   - component: {fileID: 6188627517982562320}
   - component: {fileID: 5064810010814540312}
   - component: {fileID: 166486949522428653}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -505,6 +505,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1587ed7a940efc498a8311422a38bc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_clip1: {fileID: 0}
+  m_clip2: {fileID: 0}
+  m_isPlayerInteractable: 1
 --- !u!1 &4823974418744672444
 GameObject:
   m_ObjectHideFlags: 0
@@ -517,7 +520,7 @@ GameObject:
   - component: {fileID: 6033108043381588455}
   - component: {fileID: 1240678411530502051}
   - component: {fileID: 242767840310576485}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Sphere (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -621,7 +624,7 @@ GameObject:
   - component: {fileID: 5765346410904571948}
   - component: {fileID: 6885514023181906540}
   - component: {fileID: 286781007821749626}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Interact Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -655,6 +658,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1587ed7a940efc498a8311422a38bc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_clip1: {fileID: 0}
+  m_clip2: {fileID: 0}
+  m_isPlayerInteractable: 1
 --- !u!136 &286781007821749626
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -687,7 +693,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6589715798373868445}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -723,7 +729,7 @@ GameObject:
   - component: {fileID: 7041698917468388447}
   - component: {fileID: 3451357231710134927}
   - component: {fileID: 1549705626239429029}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -828,7 +834,7 @@ GameObject:
   - component: {fileID: 3167744939775455649}
   - component: {fileID: 1660871874698011509}
   - component: {fileID: 512073551605722901}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

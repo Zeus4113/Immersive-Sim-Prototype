@@ -9,4 +9,14 @@ public interface IInteractable
 
 	}
 
+	public string GetInteractText()
+	{
+		return "";
+	}
+
+	public Sprite GetInteractSprite()
+	{
+		return null;
+	}
+
 }

@@ -72,7 +72,6 @@ namespace Enemy
 
                 foreach (Collider collider in colliders)
                 {
-
                     float angle = Vector3.Angle(transform.forward, collider.transform.position - transform.position);
 
                     if(Mathf.Abs(angle) < m_fieldOfVisionCone / 2)

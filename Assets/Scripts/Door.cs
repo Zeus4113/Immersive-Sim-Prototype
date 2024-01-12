@@ -12,6 +12,11 @@ public class Door : MonoBehaviour, IInteractable
 
 	[SerializeField] private AudioClip m_clip1, m_clip2;
 	[SerializeField] private bool m_isPlayerInteractable = true;
+	[Space(2)]
+
+	[Header("Interactable Fields")]
+	[SerializeField] private string m_interactText;
+	[SerializeField] private Sprite m_interactIcon;
 
 	void Awake()
 	{
@@ -23,6 +28,16 @@ public class Door : MonoBehaviour, IInteractable
 	{
 		StartDoorMoving();
 		Debug.Log("Door Interacted");
+	}
+
+	public string GetInteractText()
+	{
+		return m_interactText;
+	}
+
+	public Sprite GetInteractSprite()
+	{
+		return m_interactIcon;
 	}
 
 	bool c_isDoorMoving = false;
@@ -55,13 +70,10 @@ public class Door : MonoBehaviour, IInteractable
 	{
 		while (c_isDoorMoving)
 		{
-			Debug.Log("1");
 			if (m_hingeTransform != null)
 			{
-				Debug.Log("2");
 				if (m_isOpen)
 				{
-					Debug.Log("3a");
 					for (int i = 0; i <= (m_rotation); i++)
 					{
 						m_hingeTransform.Rotate(0, -1, 0);
@@ -81,7 +93,6 @@ public class Door : MonoBehaviour, IInteractable
 				{
 					m_source.PlayOneShot(m_clip1);
 
-					Debug.Log("3b");
 					for (int i = 0; i <= (m_rotation); i++)
 					{
 						m_hingeTransform.Rotate(0, 1, 0);

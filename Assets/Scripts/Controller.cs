@@ -29,7 +29,7 @@ namespace Player
 			m_movement.Init(m_input, this);
 			m_visibilityCalculator.Init(this);
 			m_interact.Init(m_input, this);
-			m_audioManager.Init(m_movement, this);
+			//m_audioManager.Init(m_movement, this);
 		}
 
 		public Movement GetMovement()

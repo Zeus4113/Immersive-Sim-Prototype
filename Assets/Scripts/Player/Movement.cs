@@ -40,6 +40,7 @@ namespace Player
 		[Header("Player Jump Variables")]
 		// Player jump variable
 		[SerializeField] private float jumpForce = 100f;
+		[SerializeField] private float m_jumpCooldown = 1f;
 		[Space(2)]
 
 		[Header("Camera Variables")]
@@ -66,6 +67,7 @@ namespace Player
 
 		private bool crouchingBlocked;
 		private bool isGrounded;
+		private bool canJump = true;
 
 
 
@@ -109,6 +111,9 @@ namespace Player
 
 				m_playerInput.actions.FindAction("Run").performed += OnRun;
 				m_playerInput.actions.FindAction("Run").canceled += OnRun;
+
+				m_playerInput.actions.FindAction("Tool Menu").performed += ShowMenu;
+				m_playerInput.actions.FindAction("Tool Menu").canceled += RemoveMenu;
 			}
 			else if (!isTrue)
 			{
@@ -247,7 +252,7 @@ namespace Player
 
 		IEnumerator Rotating(InputAction.CallbackContext ctx)
 		{
-			if (c_isRotating)
+			if (c_isRotating && !m_isMenuShown)
 			{
 				playerRotationValue = ctx.ReadValue<Vector2>().x;
 				cameraRotationValue = ctx.ReadValue<Vector2>().y;
@@ -261,6 +266,18 @@ namespace Player
 
 			StopRotation(ctx);
 
+		}
+
+		bool m_isMenuShown = false;
+
+		void ShowMenu(InputAction.CallbackContext ctx)
+		{
+			m_isMenuShown = true;
+		}
+
+		void RemoveMenu(InputAction.CallbackContext ctx)
+		{
+			m_isMenuShown = false;
 		}
 
 		public void CrouchingBlocked(bool isTrue)
@@ -314,6 +331,9 @@ namespace Player
 					currentMovementState = MovementStates.crouchedWalking;
 					break;
 
+				case MovementStates.idle:
+					currentMovementState = MovementStates.idle;
+					break;
 
 				default:
 					break;
@@ -403,9 +423,10 @@ namespace Player
 
 		public void OnJump(InputAction.CallbackContext ctx)
 		{
-			if (isGrounded)
+			if (isGrounded && canJump)
 			{
 				playerRigidbody.AddForce(0, jumpForce, 0, ForceMode.Impulse);
+				StartCoroutine(JumpCooldown());
 			}
 		}
 
@@ -448,6 +469,13 @@ namespace Player
 
 		}
 
+		IEnumerator JumpCooldown()
+		{
+			canJump = false;
 
+			yield return new WaitForSeconds(m_jumpCooldown);
+
+			canJump = true;
+		}
 	}
 }

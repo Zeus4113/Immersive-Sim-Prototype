@@ -20,7 +20,7 @@ public class InteractIcon : MonoBehaviour
 
 	public void ToggleInteract(bool isEnabled)
 	{
-		Debug.Log(isEnabled);
+		//Debug.Log(isEnabled);
 		if (isEnabled) m_icon.sprite = m_interactIcon;
 		else if(!isEnabled) m_icon.sprite = m_crosshair;
 
@@ -36,4 +36,18 @@ public class InteractIcon : MonoBehaviour
 		m_interactText.text = newText;
 	}
 
+	public void SetIcon(GameObject interactable)
+	{
+		if(interactable == null)
+		{
+			m_interactText.text = "";
+			m_icon.sprite = m_crosshair;
+		}
+		else if(interactable != null)
+		{
+			IInteractable i = interactable.GetComponent<IInteractable>();
+			m_interactText.text = i.GetInteractText();
+			m_icon.sprite = i.GetInteractSprite();
+		}	
+	}
 }
