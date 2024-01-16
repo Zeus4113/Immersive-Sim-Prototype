@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
 	private InteractIcon m_interactIcon;
 	private HealthBar m_healthBar;
 	private MissionScore m_missionScore;
+	private HintPopup m_hintPopup;
 
 	public void Init(GameManager gm)
 	{
@@ -21,6 +22,7 @@ public class UIManager : MonoBehaviour
 		m_interactIcon = transform.Find("Interact Icon").GetComponent<InteractIcon>();
 		m_healthBar = transform.Find("Health Bar").GetComponent<HealthBar>();
 		m_missionScore = transform.Find("Mission Score").GetComponent<MissionScore>();
+		m_hintPopup = transform.Find("Hint Popup").GetComponent<HintPopup>();
 
 		SetupHUD();
 
@@ -31,6 +33,7 @@ public class UIManager : MonoBehaviour
 		m_healthBar.SetText(100);
 		m_missionScore.SetText(0);
 		m_interactIcon.ToggleInteract(false);
+		m_hintPopup.DisplayHint(null);
 
 
 		//m_gameManager.GetController().GetInteract().IsPresent += m_interactIcon.ToggleInteract;
@@ -38,6 +41,12 @@ public class UIManager : MonoBehaviour
 		m_gameManager.GetController().GetInteract().UpdateIcon += m_interactIcon.SetIcon;
 		m_gameManager.GetLootManager().ScoreIncrease += m_missionScore.SetText;
 		m_gameManager.GetController().GetHealthComponent().healthChange += m_healthBar.SetText;
+	}
+
+	public void ResetUI()
+	{
+		m_interactIcon.ToggleInteract(false);
+		m_hintPopup.DisplayHint(null);
 	}
 
 	public VisibilityMeter GetVisibilityMeter()
@@ -59,6 +68,12 @@ public class UIManager : MonoBehaviour
 	{
 		return m_interactIcon;
 	}
+
+	public HintPopup GetHintPopup()
+	{
+		return m_hintPopup;
+	}
+
 	public GameManager GetManager()
 	{
 		return m_gameManager;

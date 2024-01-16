@@ -21,6 +21,7 @@ public class Footsteps : MonoBehaviour
 	[SerializeField] private float m_xAxisHeadbobModifier = 1f;
 	[SerializeField] private float m_zAxisHeadbobModifier = 1f;
 	[SerializeField] private float m_yAxisHeadbobModifier = 1f;
+	[SerializeField] private float m_lerpSpeed = 1f;
 	[Space(2)]
 
 	[Header("References")]
@@ -90,7 +91,7 @@ public class Footsteps : MonoBehaviour
 			Vector3 headMovement = Vector3.Lerp(
 				m_cameraPosition.localPosition,
 				new Vector3((xAxisMovement * m_xAxisHeadbobModifier), 0.5f + (yAxisMovement * m_yAxisHeadbobModifier), (zAxisMovement * m_zAxisHeadbobModifier)),
-				Time.fixedDeltaTime);
+				(Time.fixedDeltaTime * m_lerpSpeed));
 
 			m_cameraPosition.localPosition = headMovement;
 

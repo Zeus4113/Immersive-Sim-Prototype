@@ -11,6 +11,7 @@ namespace Enemy
 		[SerializeField] private Transform m_eyeSocket;
 
 		public event Disturbance perceptionAlerted;
+		public event Disturbance perceptionLost;
 
 		float m_updateTime = 0.1f;
 		PerceptionDataScriptableObject m_data;

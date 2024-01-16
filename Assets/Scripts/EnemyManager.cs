@@ -6,37 +6,26 @@ public class EnemyManager : MonoBehaviour
 {
 	private GameManager m_gameManager;
 
-	private List<IBehaviourable> m_behaviors;
+	private List<GameObject> m_enemies;
 
 	public void Init(GameManager gm)
 	{
 		m_gameManager = gm;
 		m_gameManager.GetCheckpointManager().resetCheckpoint += ResetEnemies;
 
-		m_behaviors = new List<IBehaviourable>();
+		m_enemies = new List<GameObject>();
 
 		for (int i = 0; i < transform.childCount; i++)
 		{
-			m_behaviors.Add(transform.GetChild(i).GetComponent<IBehaviourable>());
-			m_behaviors[i].Init(this);
-			m_behaviors[i].StartThinking();
+			m_enemies.Add(transform.GetChild(i).gameObject);
 		}
 	}
 
 	public void ResetEnemies()
 	{
-		for (int i = 0; i < m_behaviors.Count; i++)
+		for (int i = 0; i < m_enemies.Count; i++)
 		{
-			m_behaviors[i].ResetBehaviour();
-			m_behaviors[i].StartThinking();
-		}
-	}
-
-	public void RemoveBehaviour(GameObject enemy)
-	{
-		if(enemy.GetComponent<IBehaviourable>() != null)
-		{
-			m_behaviors.Remove(enemy.GetComponent<IBehaviourable>());
+			m_enemies[i].GetComponent<IAlertable>().StopAlerted();
 		}
 	}
 

@@ -41,8 +41,8 @@ namespace Player
 				m_input.actions.FindAction("Use Tool").canceled += CancelTool;
 			}
 
-			//m_flashlight = GetComponentInChildren<Flashlight>();
-			//m_flashlight.Init(this);
+			m_flashlight = GetComponentInChildren<Flashlight>();
+			m_flashlight.Init(this);
 
 			m_lockpick = GetComponentInChildren<Lockpick>();
 			m_lockpick.Init(this);
@@ -110,7 +110,7 @@ namespace Player
 			c_isSelecting = true;
 
 			if (c_selecting != null) return;
-			c_selecting = StartCoroutine(Selecting());
+			c_selecting = StartCoroutine(Selecting(ctx));
 		}
 
 		void StopSelecting(InputAction.CallbackContext ctx)
@@ -123,20 +123,42 @@ namespace Player
 			c_selecting = null;
 		}
 
-		IEnumerator Selecting()
+		IEnumerator Selecting(InputAction.CallbackContext ctx)
 		{
+			float angle = 0f;
+
 			while (c_isSelecting)
 			{
 				Vector2 mouseDelta = m_input.actions.FindAction("Rotation").ReadValue<Vector2>();
 
-				Debug.Log("Current Delta: " + mouseDelta);
+				if(mouseDelta.magnitude > 0.1f)
+				{
+					angle = Vector2.SignedAngle(Vector2.up, mouseDelta);
+					angle = MathTools.NormalizeAngle(angle);
 
-				float angle = Vector2.SignedAngle(Vector2.up, mouseDelta);
+					Debug.LogWarning("Current Angle: " + angle);
 
-				Debug.Log("Current Angle: " + angle);
+					switch (angle)
+					{
+						case float x when x >= 0 && x < 120:
+							m_currentTool = Tools.flashlight;
+							break;
+						case float x when x >= 120 && x < 240:
+							m_currentTool = Tools.lockpick;
+							break;
+						case float x when x >= 240 && x < 360:
+							m_currentTool = Tools.keychain;
+							break;
+						default:
+							break;
+					}
+				}
+
+				Debug.LogWarning("Current Tool: " + m_currentTool);
 
 				yield return new WaitForFixedUpdate();
 			}
+			StopSelecting(ctx);
 		}
 
 	}

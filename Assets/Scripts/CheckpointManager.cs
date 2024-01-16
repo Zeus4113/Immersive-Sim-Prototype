@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CheckpointManager : MonoBehaviour, IInteractable
+public class CheckpointManager : MonoBehaviour, ITriggerable
 {
 	public delegate void CheckpointEvent();
 	public event CheckpointEvent resetCheckpoint;
@@ -24,7 +24,7 @@ public class CheckpointManager : MonoBehaviour, IInteractable
 		}
 	}
 
-	public void Interact()
+	public void Trigger()
 	{
 		for (int i = 0; i < m_checkpoints.Length; i++)
 		{
@@ -68,7 +68,10 @@ public class CheckpointManager : MonoBehaviour, IInteractable
 
             if (m_activeCheckpoint != null)
             {
-                GameObject player = m_gameManager.GetController().gameObject;
+				m_gameManager.GetUIManager().ResetUI();
+				m_gameManager.GetEnemyManager().ResetEnemies();
+
+				GameObject player = m_gameManager.GetController().gameObject;
 
                 player.transform.position = m_activeCheckpoint.transform.position;
                 player.transform.rotation = m_activeCheckpoint.transform.rotation;

@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Enemy;
 
-public class SecurityCamera : MonoBehaviour
+public class SecurityCamera : MonoBehaviour, IAlertable
 {
+
 	[Header("Floats")]
 	[SerializeField] private float m_updateTime = 0.1f;
 	[SerializeField] private float m_cameraRotation = 45f;
 	[SerializeField] private float m_cameraStopTime = 0.5f;
-	[SerializeField] private float m_initialRotation = 0f; 
+	[SerializeField] private float m_initialRotation = 0f;
+	[SerializeField] private float m_defaultAlertTime = 5f;
 	[Space(2)]
 
 	[Header("Data Sets")]
@@ -30,6 +32,7 @@ public class SecurityCamera : MonoBehaviour
 
 	[Header("Triggerables")]
 	[SerializeField] private GameObject[] m_triggerables;
+	[SerializeField] private Alarm m_alarm;
 
 	void TriggerObjects()
 	{
@@ -57,24 +60,33 @@ public class SecurityCamera : MonoBehaviour
 
 		m_light.color = Color.green;
 		m_renderer.material = m_greenEmissive;
-		m_audioSource.Stop();
+		m_audioSource.Play();
 	}
 
 	bool c_isAlerted = false;
 	Coroutine c_alerted;
-	float m_alertTime = 5f;
+	float m_alertTime;
 
-	void StartAlerted(float amount, Vector3 position)
+	public void StartAlerted(float amount, Vector3 position)
 	{
-		m_alertTime = 5f;
+		m_alertTime = m_defaultAlertTime;
+
+		if (m_alarm != null) m_alarm.StartAlerted(m_defaultAlertTime);
+
 		if (c_isAlerted) return;
 		c_isAlerted = true;
 
 		if (c_alerted != null) return;
-		c_alerted = StartCoroutine(Alerted());
+		c_alerted = StartCoroutine(Alerted(position));
+
+		m_light.color = Color.red;
+		m_renderer.material = m_redEmissive;
+
+		StopRotating();
+		TriggerObjects();
 	}
 
-	void StopAlerted()
+	public void StopAlerted()
 	{
 		if (!c_isAlerted) return;
 		c_isAlerted = false;
@@ -82,31 +94,25 @@ public class SecurityCamera : MonoBehaviour
 		if (c_alerted == null) return;
 		StopCoroutine(c_alerted);
 		c_alerted = null;
+
+		m_light.color = Color.green;
+		m_renderer.material = m_greenEmissive;
+		StartRotating();
 	}
 
-	IEnumerator Alerted()
+	IEnumerator Alerted(Vector3 AlertPosition)
 	{
-		m_light.color = Color.red;
-		m_renderer.material = m_redEmissive;
-		m_audioSource.Play();
-		StopRotating();
-		TriggerObjects();
-
 		while (c_isAlerted && m_alertTime > 0)
 		{
+
+			transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(AlertPosition - transform.position), Time.fixedDeltaTime);
 			m_alertTime -= Time.fixedDeltaTime;
 			if (m_alertTime < 0) m_alertTime = 0;
 
 			yield return new WaitForFixedUpdate();
 		}
 
-		m_light.color = Color.green;
-		m_renderer.material = m_greenEmissive;
-		m_audioSource.Stop();
-		StartRotating();
-
 		StopAlerted();
-
 	}
 
 	bool c_isRotating = false;
