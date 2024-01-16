@@ -9,6 +9,11 @@ public interface IInteractable
 
 	}
 
+	public void Interact(Player.Interaction interaction)
+	{
+
+	}
+
 	public string GetInteractText()
 	{
 		return "";

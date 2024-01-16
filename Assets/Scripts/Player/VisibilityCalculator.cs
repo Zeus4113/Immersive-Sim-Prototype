@@ -37,7 +37,9 @@ public class VisibilityCalculator : MonoBehaviour
 		{
 			velocity = m_rb.velocity.magnitude;
 			m_visibilityLevel = DetermineTotalVisibility(DetermineRaycastVisibility(), velocity);
-			updateHud.Invoke(m_visibilityLevel / 100);
+
+			if(m_flashlightEnabled) updateHud.Invoke((m_visibilityLevel + 30) / 100);
+			else updateHud.Invoke(m_visibilityLevel / 100);
 
 			yield return new WaitForSeconds(0.01f);
 		}
@@ -89,5 +91,12 @@ public class VisibilityCalculator : MonoBehaviour
 		}
 
 		return visibilityTotal;
+	}
+
+	bool m_flashlightEnabled;
+
+	public void FlashlightEnabled(bool isEnabled)
+	{
+		m_flashlightEnabled = isEnabled;
 	}
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Footsteps : MonoBehaviour
 {
-	float m_stepDistance = 2f;
+	[SerializeField] float m_stepDistance = 2f;
 	float m_distanceSinceLastStep = 0f;
 
 	AudioSource m_audioSource;
@@ -58,21 +58,24 @@ public class Footsteps : MonoBehaviour
 		}
 	}
 
+	bool m_isFalling;
+
 	void JumpSound()
 	{
 		float magnitude = m_rigidbody.velocity.y;
 
-		if (magnitude! > 0.1f || magnitude! < -0.1f) return;
-
-		if (magnitude < -2f)
+		if(magnitude < -0.4f && !m_isFalling)
 		{
-			if (m_rigidbodyChecker.IsGrounded())
-			{
-				Debug.LogWarning("Grounded " + m_rigidbodyChecker.GetTag());
-				m_audioSource.clip = DetermineAudioClip(m_rigidbodyChecker.GetTag());
-				m_audioSource.volume = 0.35f * DetermineVolumeModifer(m_rigidbodyChecker.GetTag());
-				m_audioSource.Play();
-			}
+			m_isFalling = true;
+		}
+
+		if (m_rigidbodyChecker.IsGrounded() & m_isFalling)
+		{
+			m_isFalling = false;
+			Debug.LogWarning("Grounded " + m_rigidbodyChecker.GetTag());
+			m_audioSource.clip = DetermineAudioClip(m_rigidbodyChecker.GetTag());
+			m_audioSource.volume = 0.35f * DetermineVolumeModifer(m_rigidbodyChecker.GetTag());
+			m_audioSource.Play();
 		}
 
 	}

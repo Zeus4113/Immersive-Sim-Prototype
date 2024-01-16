@@ -21,8 +21,6 @@ namespace Player
 			if (m_input != null)
 			{
 				m_input.actions.FindAction("Interact").performed += OnInteraction;
-				m_input.actions.FindAction("Tool Menu").performed += StartSelecting;
-				m_input.actions.FindAction("Tool Menu").canceled += StopSelecting;
 			}
 		}
 
@@ -30,45 +28,10 @@ namespace Player
 		{
 			foreach (GameObject x in m_interactables)
 			{
-				x.GetComponent<IInteractable>().Interact();
-			}
-		}
-
-		bool c_isSelecting = false;
-		Coroutine c_selecting;
-
-		void StartSelecting(InputAction.CallbackContext ctx)
-		{
-			if (c_isSelecting) return;
-			c_isSelecting = true;
-
-			if (c_selecting != null) return;
-			c_selecting = StartCoroutine(Selecting());
-		}
-
-		void StopSelecting(InputAction.CallbackContext ctx)
-		{
-			if (!c_isSelecting) return;
-			c_isSelecting = false;
-
-			if (c_selecting == null) return;
-			StopCoroutine(c_selecting);
-			c_selecting = null;
-		}
-
-		IEnumerator Selecting()
-		{
-			while (c_isSelecting)
-			{
-				Vector2 mouseDelta = m_input.actions.FindAction("Rotation").ReadValue<Vector2>();
-
-				Debug.Log("Current Delta: " + mouseDelta);
-
-				float angle = Vector2.SignedAngle(Vector2.up, mouseDelta);
-
-				Debug.Log("Current Angle: " + angle);
-
-				yield return new WaitForFixedUpdate();
+				if(x != null)
+				{
+					x.GetComponent<IInteractable>().Interact(this);
+				}
 			}
 		}
 

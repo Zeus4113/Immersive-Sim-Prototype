@@ -12,6 +12,7 @@ namespace Player
 		[SerializeField] private Interaction m_interact;
 		[SerializeField] private HealthComponent m_healthComponent;
 		[SerializeField] private PlayerAudioManager m_audioManager;
+		[SerializeField] private Toolset m_toolset;
 
 		private PlayerInput m_input;
 		private GameManager m_gameManager;
@@ -29,6 +30,8 @@ namespace Player
 			m_movement.Init(m_input, this);
 			m_visibilityCalculator.Init(this);
 			m_interact.Init(m_input, this);
+			m_toolset.Init(m_input, this);
+
 			//m_audioManager.Init(m_movement, this);
 		}
 
@@ -60,6 +63,11 @@ namespace Player
 		public PlayerAudioManager GetAudioManager()
 		{
 			return m_audioManager;
+		}
+
+		public Toolset GetToolset()
+		{
+			return m_toolset;
 		}
 	}
 }

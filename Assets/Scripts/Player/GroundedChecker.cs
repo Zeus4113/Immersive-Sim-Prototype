@@ -81,17 +81,7 @@ public class GroundedChecker : MonoBehaviour
 			{
 				StopChecking();
 			}
-
         }
-
-		
-
-  //      if (other.gameObject != this.transform.parent.gameObject)
-		//{
-		//	movementComponent.CheckGrounded(false);
-		//	m_currentFloorTile = null;
-
-  //      }
 	}
 
 	private void OnTriggerEnter(Collider other)
@@ -100,21 +90,6 @@ public class GroundedChecker : MonoBehaviour
 		{
             m_colliders.Add(other);
 			StartChecking();
-
         }
-        //if (other.gameObject != this.transform.parent.gameObject)
-        //{
-        //    movementComponent.CheckGrounded(false);
-        //    m_currentFloorTile = null;
-
-        //}
     }
-
-	//private void OnTriggerStay(Collider other)
-	//{
-	//	if (other.gameObject != this.transform.parent.gameObject)
-	//	{
-	//		movementComponent.CheckGrounded(true);
-	//	}
-	//}
 }

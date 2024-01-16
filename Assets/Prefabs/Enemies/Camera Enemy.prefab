@@ -256,7 +256,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 0, g: 1, b: 0.054581404, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.4
   m_Range: 0.5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -288,7 +288,7 @@ Light:
       e33: 1
     m_UseCullingMatrixOverride: 0
   m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
+  m_DrawHalo: 1
   m_Flare: {fileID: 0}
   m_RenderMode: 0
   m_CullingMask:
@@ -764,6 +764,7 @@ MonoBehaviour:
   m_updateTime: 0.1
   m_cameraRotation: 45
   m_cameraStopTime: 0.5
+  m_initialRotation: 0
   m_perceptionData: {fileID: 11400000, guid: bb634145c5d93cd48b3e85976bf9c4c3, type: 2}
   m_perception: {fileID: 4975839893752451587}
   m_renderer: {fileID: 5807828753280325762}
@@ -771,6 +772,7 @@ MonoBehaviour:
   m_audioSource: {fileID: 2236687915660448847}
   m_greenEmissive: {fileID: 2100000, guid: 2d7fc8497baa76a4caa969f72af912fb, type: 2}
   m_redEmissive: {fileID: 2100000, guid: 72248524cf349ab468383ffe7bb37b60, type: 2}
+  m_triggerables: []
 --- !u!114 &4975839893752451587
 MonoBehaviour:
   m_ObjectHideFlags: 0

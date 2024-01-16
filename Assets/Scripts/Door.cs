@@ -8,9 +8,11 @@ public class Door : MonoBehaviour, IInteractable
 	private Transform m_hingeTransform;
 	private bool m_isOpen = false;
 	private float m_rotation = 90f;
-	private AudioSource m_source;
 
-	[SerializeField] private AudioClip m_clip1, m_clip2;
+	private Lock m_lock;
+
+	[SerializeField] private AudioClip m_openingSound, m_closingSound, m_lockedSound;
+	[SerializeField] private AudioSource m_source;
 	[SerializeField] private bool m_isPlayerInteractable = true;
 	[Space(2)]
 
@@ -21,13 +23,21 @@ public class Door : MonoBehaviour, IInteractable
 	void Awake()
 	{
 		m_hingeTransform = transform.parent;
-		m_source = GetComponent<AudioSource>();
+		m_lock = transform.GetComponent<Lock>();
 	}
 
-	public void Interact()
+	public void Interact(Player.Interaction interaction)
 	{
-		StartDoorMoving();
-		Debug.Log("Door Interacted");
+		if(m_lock != null && m_lock.GetLocked())
+		{
+			Debug.LogWarning("Locked");
+			m_source.PlayOneShot(m_lockedSound);
+		}
+		else if(m_lock != null && !m_lock.GetLocked())
+		{
+			Debug.LogWarning("Unlocked");
+			StartDoorMoving();
+		}
 	}
 
 	public string GetInteractText()
@@ -81,17 +91,17 @@ public class Door : MonoBehaviour, IInteractable
 
 						if(i == 75)
 						{
-							m_source.PlayOneShot(m_clip2);
+							m_source.PlayOneShot(m_closingSound);
 						}
 					}
-
+					m_interactText = "Open";
 					m_isOpen = false;
 					StopDoorMoving();
 				}
 
 				else if (!m_isOpen)
 				{
-					m_source.PlayOneShot(m_clip1);
+					m_source.PlayOneShot(m_openingSound);
 
 					for (int i = 0; i <= (m_rotation); i++)
 					{
@@ -99,6 +109,7 @@ public class Door : MonoBehaviour, IInteractable
 						yield return new WaitForFixedUpdate();
 					}
 
+					m_interactText = "Close";
 					m_isOpen = true;
 					StopDoorMoving();
 				}
