@@ -28,35 +28,19 @@ public class Footsteps : MonoBehaviour
 	[SerializeField] private GroundedChecker m_rigidbodyChecker;
 	[SerializeField] private Transform m_cameraPosition;
 
+	Player.Movement m_movement;
+
 	private void Start()
 	{
 		m_rigidbody = GetComponent<Rigidbody>();
 		m_audioSource = GetComponent<AudioSource>();
+		m_movement = GetComponent<Player.Movement>();
 	}
 
 	private void FixedUpdate()
 	{
-		FootstepSound();
-		HeadbobEffect();
+		PlayerHeadbob();
 		JumpSound();
-	}
-
-	void FootstepSound()
-	{
-		float magnitude = m_rigidbody.velocity.magnitude - m_rigidbody.velocity.y;
-
-		if (magnitude > 0.01f && m_rigidbodyChecker.IsGrounded())
-		{
-			m_distanceSinceLastStep += magnitude * Time.fixedDeltaTime;
-
-			if (m_distanceSinceLastStep > m_stepDistance)
-			{
-				m_distanceSinceLastStep = 0;
-				m_audioSource.clip = DetermineAudioClip(m_rigidbodyChecker.GetTag());
-				m_audioSource.volume = (magnitude * 0.1f) * DetermineVolumeModifer(m_rigidbodyChecker.GetTag());
-				m_audioSource.Play();
-			}
-		}
 	}
 
 	bool m_isFalling;
@@ -65,91 +49,142 @@ public class Footsteps : MonoBehaviour
 	{
 		float magnitude = m_rigidbody.velocity.y;
 
-		if(magnitude < -0.4f && !m_isFalling)
+		if(magnitude < -2f && !m_isFalling && !m_rigidbodyChecker.IsGrounded())
 		{
 			m_isFalling = true;
 		}
 
 		if (m_rigidbodyChecker.IsGrounded() & m_isFalling)
 		{
+			m_steppingDistance = 0f;
 			m_isFalling = false;
-			Debug.LogWarning("Grounded " + m_rigidbodyChecker.GetTag());
 			m_audioSource.clip = DetermineAudioClip(m_rigidbodyChecker.GetTag());
-			m_audioSource.volume = 0.35f * DetermineVolumeModifer(m_rigidbodyChecker.GetTag());
+			m_audioSource.volume = 1f * DetermineVolumeModifer(m_rigidbodyChecker.GetTag());
 			m_audioSource.Play();
+			Debug.Log("Jump Sound");
 		}
 
 	}
-		void HeadbobEffect()
+
+	float m_steppingDistance = 0f;
+	int fullstepSwitcher = 1;
+	int halfstepSwitcher = 1;
+
+	void PlayerHeadbob()
+	{
+		Vector3 velocity = transform.InverseTransformDirection(m_rigidbody.velocity);
+		Vector3 headbob;
+		float xAxisSinWave;
+		float yAxisCosWave;
+
+		if (velocity.magnitude < 0.1f)
 		{
-			Vector3 velocity = transform.InverseTransformDirection(m_rigidbody.velocity);
-
-			float xAxisMovement = velocity.x;
-			float zAxisMovement = velocity.z;
-			float yAxisMovement = Mathf.Sin(m_distanceSinceLastStep / m_stepDistance);
-
-			Vector3 headMovement = Vector3.Lerp(
+			m_cameraPosition.localPosition = Vector3.Lerp(
 				m_cameraPosition.localPosition,
-				new Vector3((xAxisMovement * m_xAxisHeadbobModifier), 0.5f + (yAxisMovement * m_yAxisHeadbobModifier), (zAxisMovement * m_zAxisHeadbobModifier)),
-				(Time.fixedDeltaTime * m_lerpSpeed));
+				new Vector3(m_movement.GetLeanAmount(), m_movement.GetCameraHeight(), 0),
+				(Time.fixedDeltaTime * m_lerpSpeed)
+			);
 
-			m_cameraPosition.localPosition = headMovement;
-
+			return;
 		}
 
-		AudioClip DetermineAudioClip(string tag)
+		if (velocity.magnitude > 0.1f && !m_rigidbodyChecker.IsGrounded() && m_isFalling)
 		{
-			tag = tag.ToLower();
+			m_cameraPosition.localPosition = Vector3.Lerp(
+				m_cameraPosition.localPosition,
+				new Vector3(0, m_movement.GetCameraHeight() + (velocity.y / 4), 0),
+				(Time.fixedDeltaTime * m_lerpSpeed)
+			);
 
-			switch (tag)
-			{
-				case "floor":
-
-					return m_floorClips[Random.Range(0, m_floorClips.Length)];
-
-				case "wood":
-
-					return m_woodClips[Random.Range(0, m_woodClips.Length)]; ;
-
-				case "carpet":
-
-					return m_carpetClips[Random.Range(0, m_carpetClips.Length)]; ;
-
-				case "tile":
-
-					return m_tileClips[Random.Range(0, m_tileClips.Length)]; ;
-
-				default:
-
-					return null;
-			}
+			return;
 		}
 
-		float DetermineVolumeModifer(string tag)
+		if (velocity.magnitude > 0.1f && m_rigidbodyChecker.IsGrounded() && !m_isFalling) 
 		{
-			tag = tag.ToLower();
 
-			switch (tag)
+			m_steppingDistance += velocity.magnitude * halfstepSwitcher * Time.fixedDeltaTime;
+
+			Debug.Log("Is Walking: " + m_steppingDistance);
+
+			if (m_steppingDistance >= m_stepDistance)
 			{
-				case "floor":
-
-					return 1f;
-
-				case "wood":
-
-					return 0.7f;
-
-				case "carpet":
-
-					return 0.35f;
-
-				case "tile":
-
-					return 1.5f;
-
-				default:
-
-					return 0;
+				m_steppingDistance = m_stepDistance;
+				halfstepSwitcher = halfstepSwitcher * -1;
+				m_audioSource.clip = DetermineAudioClip(m_rigidbodyChecker.GetTag());
+				m_audioSource.volume = (velocity.magnitude * 0.1f) * DetermineVolumeModifer(m_rigidbodyChecker.GetTag());
+				m_audioSource.Play();
+				Debug.Log("Footstep Sound Firing");
 			}
+
+			if (m_steppingDistance <= 0)
+			{
+				m_steppingDistance = 0;
+				fullstepSwitcher = -fullstepSwitcher;
+				halfstepSwitcher = halfstepSwitcher * -1;
+			}
+
+			yAxisCosWave = Mathf.Cos(m_steppingDistance / m_stepDistance);
+			xAxisSinWave = Mathf.Sin(m_steppingDistance / m_stepDistance) * fullstepSwitcher;
+
+			headbob = new Vector3((xAxisSinWave * m_xAxisHeadbobModifier) + m_movement.GetLeanAmount(), (m_movement.GetCameraHeight() - (m_yAxisHeadbobModifier / 2)) + (yAxisCosWave * m_yAxisHeadbobModifier), 0);
+
+			m_cameraPosition.localPosition = Vector3.Lerp(m_cameraPosition.localPosition, headbob, Time.fixedDeltaTime * m_lerpSpeed);
 		}
+	}
+
+	AudioClip DetermineAudioClip(string tag)
+	{
+		tag = tag.ToLower();
+
+		switch (tag)
+		{
+			case "floor":
+
+				return m_floorClips[Random.Range(0, m_floorClips.Length)];
+
+			case "wood":
+
+				return m_woodClips[Random.Range(0, m_woodClips.Length)]; ;
+
+			case "carpet":
+
+				return m_carpetClips[Random.Range(0, m_carpetClips.Length)]; ;
+
+			case "tile":
+
+				return m_tileClips[Random.Range(0, m_tileClips.Length)]; ;
+
+			default:
+
+				return null;
+		}
+	}
+
+	float DetermineVolumeModifer(string tag)
+	{
+		tag = tag.ToLower();
+
+		switch (tag)
+		{
+			case "floor":
+
+				return 1f;
+
+			case "wood":
+
+				return 0.7f;
+
+			case "carpet":
+
+				return 0.35f;
+
+			case "tile":
+
+				return 1.5f;
+
+			default:
+
+				return 0;
+		}
+	}
 	}

@@ -7,7 +7,10 @@ public delegate void DetectionEvent(GameObject detector);
 
 public class Alarm : MonoBehaviour, IAlertable
 {
-	public event DetectionEvent alarmRaised;
+	//public delegate void Alert(GameObject alertObject);
+	//public event Alert alertTriggered;
+
+	public event IAlertable.Alert alertTriggered;
 
 	private float m_alertTime;
 
@@ -28,6 +31,7 @@ public class Alarm : MonoBehaviour, IAlertable
 		if (c_alarmed != null) return;
 		c_alarmed = StartCoroutine(Alarmed());
 
+		alertTriggered?.Invoke(this.gameObject);
 		m_audioSource.Play();
 		m_renderer.material = m_redEmissive;
 	}
@@ -55,7 +59,6 @@ public class Alarm : MonoBehaviour, IAlertable
 
 	IEnumerator Alarmed()
 	{
-		alarmRaised?.Invoke(this.gameObject);
 
 		while(m_alertTime > 0)
 		{

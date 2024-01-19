@@ -12,18 +12,30 @@ public class LootManager : MonoBehaviour
 
 	private List<Loot> m_lootList = new List<Loot>();
 	private int m_currentScore = 0;
+	private int m_totalScore = 0;
+	private int m_requiredItemTotal = 0;
+	private int m_currentRequiredItems = 0;
 
 	public void Init(GameManager gm)
 	{
+		m_currentScore = 0;
+		m_totalScore = 0;
+		m_currentRequiredItems = 0;
+		m_requiredItemTotal = 0;
+
 		m_gameManager = gm;
 		m_lootList.AddRange(transform.GetComponentsInChildren<Loot>());
 
 		for(int i = 0; i < m_lootList.Count; i++)
 		{
 			m_lootList[i].Init(this);
+
+			if(m_lootList[i].GetRequiredItem()) m_requiredItemTotal++;
+
+			m_totalScore += m_lootList[i].GetValue();
 		}
 
-		Debug.Log(m_lootList.Count);
+		Debug.Log("Total Score: " + m_totalScore);
 	}
 
 	public void AddLoot(Loot newItem)
@@ -33,9 +45,29 @@ public class LootManager : MonoBehaviour
 
 	public void Remove(Loot newItem)
 	{
-		m_lootList.Remove(newItem);
 		m_currentScore += newItem.GetValue();
+
+		if (newItem.GetRequiredItem()) m_currentRequiredItems++;
 		ScoreIncrease?.Invoke(m_currentScore);
+
+		m_lootList.Remove(newItem);
+	}
+
+	public float GetScore()
+	{
+		float score = (((float) m_currentScore) / ((float) m_totalScore)) * 100;
+
+		Debug.Log("Current Score: " + m_currentScore);
+		Debug.Log("Total Score: " + m_totalScore);
+		Debug.Log("Percentage: " + score);
+
+		return score;
+	}
+
+	public bool CheckRequiredItems()
+	{
+		if (m_currentRequiredItems == m_requiredItemTotal) return true;
+		return false;
 	}
 
 	public GameManager GetManager()

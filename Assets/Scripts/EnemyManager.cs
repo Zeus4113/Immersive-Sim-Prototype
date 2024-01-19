@@ -1,12 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Enemy;
 
 public class EnemyManager : MonoBehaviour
 {
 	private GameManager m_gameManager;
 
 	private List<GameObject> m_enemies;
+
+	private int m_alarmsTripped = 0;
+	private int m_guardsAlerted = 0;
 
 	public void Init(GameManager gm)
 	{
@@ -19,6 +23,28 @@ public class EnemyManager : MonoBehaviour
 		{
 			m_enemies.Add(transform.GetChild(i).gameObject);
 		}
+
+		BindEvents();
+	}
+
+	public void BindEvents()
+	{
+		foreach(GameObject enemy in m_enemies)
+		{
+			if(enemy.GetComponent<Alarm>() != null)
+			{
+				IAlertable alertable = enemy.GetComponent<IAlertable>();
+				alertable.alertTriggered += RegisterAlert;
+			}
+		}
+	}
+
+	public void RemoveEnemy(GameObject enemy)
+	{
+		IAlertable alertable = enemy.GetComponent<IAlertable>();
+		alertable.alertTriggered -= RegisterAlert;
+		m_enemies.Remove(enemy);
+		Destroy(enemy);
 	}
 
 	public void ResetEnemies()
@@ -29,4 +55,22 @@ public class EnemyManager : MonoBehaviour
 		}
 	}
 
+	public void RegisterAlert(GameObject alertedObject)
+	{
+		if (alertedObject != null) return;
+
+		if (alertedObject.GetComponent<GuardBehaviour>()) m_guardsAlerted++;
+
+		if(alertedObject.GetComponent<Alarm>()) m_alarmsTripped++;
+	}
+
+	public int GetAlarmsTripped()
+	{
+		return m_alarmsTripped;
+	}
+
+	public int GetGuardsAlerted()
+	{
+		return m_guardsAlerted;
+	}
 }

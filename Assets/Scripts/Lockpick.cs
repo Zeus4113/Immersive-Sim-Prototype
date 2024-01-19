@@ -7,10 +7,10 @@ namespace Player
 {
 	public class Lockpick : MonoBehaviour
 	{
-		[SerializeField] private AudioClip m_lockpickingSound, m_lockpickedSound;
+		[SerializeField] private AudioClip m_lockpickingSound, m_lockedSound;
 
 		Toolset m_toolset;
-		float m_lockpickTime = 3f;
+		[SerializeField] float m_lockpickTime = 6f;
 
 		public void Init(Toolset tools)
 		{
@@ -54,6 +54,10 @@ namespace Player
 					{
 						l.GetComponent<AudioSource>().PlayOneShot(m_lockpickingSound);
 					}
+					else if(l.GetKeyRequired() == true)
+					{
+						l.GetComponent<AudioSource>().PlayOneShot(m_lockedSound);
+					}
 				}
 
 				yield return new WaitForSeconds(m_lockpickTime);
@@ -63,7 +67,6 @@ namespace Player
 					if (!l.GetKeyRequired())
 					{
 						l.SetLocked(false);
-						l.GetComponent<AudioSource>().PlayOneShot(m_lockpickedSound);
 					}
 				}
 

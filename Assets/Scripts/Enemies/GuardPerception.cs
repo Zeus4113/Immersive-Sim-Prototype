@@ -22,17 +22,17 @@ namespace Enemy
         private Transform m_playerRef = null;
         private VisibilityCalculator m_visibilityCalculator;
 
-        void OnDrawGizmos()
-        {
-            Handles.color = new Color(0, 115, 0, 0.3f);
-            Handles.DrawSolidArc(
-                this.transform.position + new Vector3(0, -1, 0),
-                this.transform.up,
-                Quaternion.AngleAxis(-m_fieldOfVisionCone / 2, this.transform.up) * this.transform.forward,
-                m_fieldOfVisionCone,
-                m_fieldOfVisionDistance
-                );
-        }
+        //void OnDrawGizmos()
+        //{
+        //    Handles.color = new Color(0, 115, 0, 0.3f);
+        //    Handles.DrawSolidArc(
+        //        this.transform.position + new Vector3(0, -1, 0),
+        //        this.transform.up,
+        //        Quaternion.AngleAxis(-m_fieldOfVisionCone / 2, this.transform.up) * this.transform.forward,
+        //        m_fieldOfVisionCone,
+        //        m_fieldOfVisionDistance
+        //        );
+        //}
 
         // Looking Coroutine
 

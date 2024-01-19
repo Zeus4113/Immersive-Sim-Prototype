@@ -5,6 +5,7 @@ using UnityEngine;
 public class Loot : MonoBehaviour, IInteractable
 {
 	[SerializeField] private int m_itemValue;
+	[SerializeField] private bool m_isRequiredItem;
 
 	[Header("Interactable Fields")]
 	[SerializeField] private string m_interactText;
@@ -17,7 +18,12 @@ public class Loot : MonoBehaviour, IInteractable
 		m_manager = lm;
 	}
 
-	public void Interact()
+	public bool GetRequiredItem()
+	{
+		return m_isRequiredItem;
+	}
+
+	public void Interact(Player.Interaction interaction)
 	{
 		if (m_manager == null) return;
 
@@ -51,6 +57,7 @@ public class Loot : MonoBehaviour, IInteractable
 	void OnDestroy()
 	{
 		m_manager.Remove(this);
+		Debug.Log("Destroyed");
 	}
 
 }

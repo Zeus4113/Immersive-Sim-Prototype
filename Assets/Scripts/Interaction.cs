@@ -28,7 +28,7 @@ namespace Player
 		{
 			foreach (GameObject x in m_interactables)
 			{
-				if(x != null)
+				if(x.GetComponent<IInteractable>() != null)
 				{
 					x.GetComponent<IInteractable>().Interact(this);
 				}
@@ -64,7 +64,6 @@ namespace Player
 		{
 			while (c_isChecking && m_interactables.Count > 0)
 			{
-				Debug.Log("Checking...");
 				UpdateIcon?.Invoke(GetLowestDistance(m_interactables.ToArray()));
 
 				yield return new WaitForFixedUpdate();
@@ -80,7 +79,7 @@ namespace Player
 		{
 			if (m_interactables.Contains(other.gameObject)) return;
 
-			LayerMask layerMask = LayerMask.GetMask("Interactables");
+			LayerMask layerMask = LayerMask.GetMask("Interactables", "Environment");
 			RaycastHit hit;
 			Physics.Raycast(transform.parent.position, other.transform.position - transform.parent.position, out hit, 5f, layerMask);
 

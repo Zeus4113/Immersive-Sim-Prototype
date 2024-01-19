@@ -85,6 +85,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Lean",
+                    "type": "Value",
+                    "id": "95505e28-f7b8-4898-a8f6-d26f5c72f008",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -272,6 +281,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Use Tool",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "df6a101e-5745-4637-8e7b-1dba9d157577",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "Scale",
+                    "groups": "",
+                    "action": "Lean",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bf9289fd-4a26-43bd-b3cc-9d2ec8ba7383",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "Scale(factor=-1)",
+                    "groups": "",
+                    "action": "Lean",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

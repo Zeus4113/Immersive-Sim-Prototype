@@ -5,6 +5,11 @@ using Enemy;
 
 public class SecurityAlarm : MonoBehaviour, IAlertable
 {
+	//public delegate void Alert(GameObject alertObject);
+	//public event Alert alertTriggered;
+
+	public event IAlertable.Alert alertTriggered;
+
 	[Header("Floats")]
 	[SerializeField] private float m_updateTime = 0.1f;
 	[SerializeField] private float m_baseAlertTime = 5f;
@@ -70,6 +75,7 @@ public class SecurityAlarm : MonoBehaviour, IAlertable
 		if (c_alerted != null) return;
 		c_alerted = StartCoroutine(Alerted());
 
+		alertTriggered?.Invoke(this.gameObject);
 		m_light.enabled = true;
 		m_renderer.material = m_redEmissive;
 		TriggerObjects();

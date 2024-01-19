@@ -7,6 +7,12 @@ namespace Player
 {
 	public class Toolset : MonoBehaviour
 	{
+		public delegate void ToolChange(Tools tool);
+
+		public event ToolChange openMenu;
+		public event ToolChange closeMenu;
+		public event ToolChange changingTools;
+
 		private PlayerInput m_input;
 		private Controller m_controller;
 
@@ -19,7 +25,7 @@ namespace Player
 			return m_controller;
 		}
 
-		enum Tools
+		public enum Tools
 		{
 			lockpick,
 			keychain,
@@ -111,6 +117,10 @@ namespace Player
 
 			if (c_selecting != null) return;
 			c_selecting = StartCoroutine(Selecting(ctx));
+
+			Time.timeScale = 0.5f;
+
+			openMenu?.Invoke(m_currentTool);
 		}
 
 		void StopSelecting(InputAction.CallbackContext ctx)
@@ -121,6 +131,10 @@ namespace Player
 			if (c_selecting == null) return;
 			StopCoroutine(c_selecting);
 			c_selecting = null;
+
+			Time.timeScale = 1f;
+
+			closeMenu?.Invoke(m_currentTool);
 		}
 
 		IEnumerator Selecting(InputAction.CallbackContext ctx)
@@ -131,7 +145,7 @@ namespace Player
 			{
 				Vector2 mouseDelta = m_input.actions.FindAction("Rotation").ReadValue<Vector2>();
 
-				if(mouseDelta.magnitude > 0.1f)
+				if(mouseDelta.magnitude > 1.25f)
 				{
 					angle = Vector2.SignedAngle(Vector2.up, mouseDelta);
 					angle = MathTools.NormalizeAngle(angle);
@@ -140,13 +154,13 @@ namespace Player
 
 					switch (angle)
 					{
-						case float x when x >= 0 && x < 120:
+						case float x when (x >= 300 && x < 360) || (x >= 0 && x < 60):
 							m_currentTool = Tools.flashlight;
 							break;
-						case float x when x >= 120 && x < 240:
+						case float x when (x >= 60 && x < 180):
 							m_currentTool = Tools.lockpick;
 							break;
-						case float x when x >= 240 && x < 360:
+						case float x when (x >= 180 && x < 300):
 							m_currentTool = Tools.keychain;
 							break;
 						default:
@@ -154,10 +168,11 @@ namespace Player
 					}
 				}
 
-				Debug.LogWarning("Current Tool: " + m_currentTool);
+				changingTools?.Invoke(m_currentTool);
 
 				yield return new WaitForFixedUpdate();
 			}
+
 			StopSelecting(ctx);
 		}
 

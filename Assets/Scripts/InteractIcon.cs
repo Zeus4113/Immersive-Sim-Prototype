@@ -46,8 +46,12 @@ public class InteractIcon : MonoBehaviour
 		else if(interactable != null)
 		{
 			IInteractable i = interactable.GetComponent<IInteractable>();
-			m_interactText.text = i.GetInteractText();
-			m_icon.sprite = i.GetInteractSprite();
+
+			if(i != null)
+			{
+				m_interactText.text = i.GetInteractText();
+				m_icon.sprite = i.GetInteractSprite();
+			}
 		}	
 	}
 }

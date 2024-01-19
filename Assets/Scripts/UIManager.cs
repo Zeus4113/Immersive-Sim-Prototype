@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
 	private HealthBar m_healthBar;
 	private MissionScore m_missionScore;
 	private HintPopup m_hintPopup;
+	private ToolMenu m_toolMenu;
 
 	public void Init(GameManager gm)
 	{
@@ -23,6 +24,7 @@ public class UIManager : MonoBehaviour
 		m_healthBar = transform.Find("Health Bar").GetComponent<HealthBar>();
 		m_missionScore = transform.Find("Mission Score").GetComponent<MissionScore>();
 		m_hintPopup = transform.Find("Hint Popup").GetComponent<HintPopup>();
+		m_toolMenu = transform.Find("Tool Menu").GetComponent<ToolMenu>();
 
 		SetupHUD();
 
@@ -41,6 +43,10 @@ public class UIManager : MonoBehaviour
 		m_gameManager.GetController().GetInteract().UpdateIcon += m_interactIcon.SetIcon;
 		m_gameManager.GetLootManager().ScoreIncrease += m_missionScore.SetText;
 		m_gameManager.GetController().GetHealthComponent().healthChange += m_healthBar.SetText;
+
+		m_gameManager.GetController().GetToolset().changingTools += m_toolMenu.HighlightImage;
+		m_gameManager.GetController().GetToolset().openMenu += m_toolMenu.OpenMenu;
+		m_gameManager.GetController().GetToolset().closeMenu += m_toolMenu.CloseMenu;
 	}
 
 	public void ResetUI()

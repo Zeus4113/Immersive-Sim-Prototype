@@ -114,6 +114,9 @@ namespace Player
 
 				m_playerInput.actions.FindAction("Tool Menu").performed += ShowMenu;
 				m_playerInput.actions.FindAction("Tool Menu").canceled += RemoveMenu;
+
+				m_playerInput.actions.FindAction("Lean").performed += StartPlayerLean;
+				m_playerInput.actions.FindAction("Lean").canceled += StopPlayerLean;
 			}
 			else if (!isTrue)
 			{
@@ -133,11 +136,34 @@ namespace Player
 
 				m_playerInput.actions.FindAction("Run").performed -= OnRun;
 				m_playerInput.actions.FindAction("Run").canceled -= OnRun;
+
+				m_playerInput.actions.FindAction("Lean").performed -= StartPlayerLean;
+				m_playerInput.actions.FindAction("Lean").canceled -= StopPlayerLean;
 			}
 		}
 
 		bool c_isMoving = false;
 		Coroutine c_moving;
+
+		float m_leanAmount = 0f;
+
+		public void StartPlayerLean(InputAction.CallbackContext ctx)
+		{
+			float direction = ctx.ReadValue<float>();
+			m_leanAmount = 0.5f * -direction;
+		}
+
+		public float GetLeanAmount()
+		{
+			return m_leanAmount;
+		}
+
+		public void StopPlayerLean(InputAction.CallbackContext ctx)
+		{
+			float direction = ctx.ReadValue<float>();
+			m_leanAmount = 0.5f * -direction;
+		}
+
 
 		void StartMovement(InputAction.CallbackContext ctx)
 		{
@@ -299,7 +325,7 @@ namespace Player
 
 		private void SetMovementMode(MovementStates newState)
 		{
-			switch(newState)
+			switch (newState)
 			{
 				case MovementStates.normal:
 					SetCapsule("standing");
@@ -349,7 +375,7 @@ namespace Player
 		{
 			if (type.ToLower() == "standing")
 			{
-				if(playerCollider.transform.localScale == new Vector3(1, 0.5f, 1))
+				if (playerCollider.transform.localScale == new Vector3(1, 0.5f, 1))
 				{
 					playerCollider.transform.localScale = new Vector3(1, 1, 1);
 					playerCollider.transform.position = transform.position + new Vector3(0, 0.5f, 0);
@@ -357,13 +383,25 @@ namespace Player
 			}
 			else if (type.ToLower() == "crouching")
 			{
-				if(playerCollider.transform.localScale == new Vector3(1, 1, 1))
+				if (playerCollider.transform.localScale == new Vector3(1, 1, 1))
 				{
 					playerCollider.transform.localScale = new Vector3(1, 0.5f, 1);
 					playerCollider.transform.position = transform.position + new Vector3(0, -0.5f, 0);
 				}
 			}
 		}
+
+		IEnumerator ScalePlayer(Vector3 newScale)
+		{
+			Vector3 initialScale = playerCollider.transform.localScale;
+
+			while (playerCollider.transform.localScale != newScale)
+			{
+				playerCollider.transform.localScale = Vector3.Lerp(initialScale, newScale, Time.fixedDeltaTime);
+				yield return new WaitForFixedUpdate();
+			}
+		}
+
 		private void SetSpeed(float multiplier)
 		{
 			currentMovementSpeed = baseMovementSpeed * multiplier;
@@ -430,10 +468,14 @@ namespace Player
 			}
 		}
 
+		float m_cameraHeight = 0.5f;
+
 		public void OnCrouch(InputAction.CallbackContext ctx)
 		{
 			if (currentMovementState == MovementStates.normal || currentMovementState == MovementStates.walking)
 			{
+				m_cameraHeight = 0.25f;
+
 				if (currentMovementState == MovementStates.normal)
 				{
 					SetMovementMode(MovementStates.crouched);
@@ -455,6 +497,8 @@ namespace Player
 				}
 				else 
 				{
+					m_cameraHeight = 0.5f;
+
 					if (currentMovementState == MovementStates.crouched)
 					{
 						SetMovementMode(MovementStates.normal);
@@ -468,6 +512,12 @@ namespace Player
 			}
 
 		}
+
+		public float GetCameraHeight()
+		{
+			return m_cameraHeight;
+		}
+
 
 		IEnumerator JumpCooldown()
 		{

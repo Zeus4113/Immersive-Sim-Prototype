@@ -4,6 +4,9 @@ using UnityEngine;
 
 public interface IAlertable
 {
+	public delegate void Alert(GameObject alertObject);
+	public event Alert alertTriggered;
+
 	public void StartAlerted() { }
 
 	public void StartAlerted(float amount) { }

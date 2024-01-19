@@ -5,6 +5,10 @@ using Enemy;
 
 public class SecurityCamera : MonoBehaviour, IAlertable
 {
+	//public delegate void Alert(GameObject alertObject);
+	//public event Alert alertTriggered;
+
+	public event IAlertable.Alert alertTriggered;
 
 	[Header("Floats")]
 	[SerializeField] private float m_updateTime = 0.1f;
@@ -81,6 +85,7 @@ public class SecurityCamera : MonoBehaviour, IAlertable
 
 		m_light.color = Color.red;
 		m_renderer.material = m_redEmissive;
+		alertTriggered?.Invoke(this.gameObject);
 
 		StopRotating();
 		TriggerObjects();
