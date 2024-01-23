@@ -25,13 +25,26 @@ public class EnemyManager : MonoBehaviour
 		}
 
 		BindEvents();
+		InitialiseEnemies();
+	}
+
+	public void InitialiseEnemies()
+	{
+		foreach (GameObject enemy in m_enemies)
+		{
+			if (enemy.GetComponent<IAlertable>() != null)
+			{
+				IAlertable alertable = enemy.GetComponent<IAlertable>();
+				alertable.Init(this);
+			}
+		}
 	}
 
 	public void BindEvents()
 	{
 		foreach(GameObject enemy in m_enemies)
 		{
-			if(enemy.GetComponent<Alarm>() != null)
+			if(enemy.GetComponent<Alarm>() != null || enemy.GetComponent<GuardBehaviour>() != null)
 			{
 				IAlertable alertable = enemy.GetComponent<IAlertable>();
 				alertable.alertTriggered += RegisterAlert;
@@ -52,6 +65,11 @@ public class EnemyManager : MonoBehaviour
 		for (int i = 0; i < m_enemies.Count; i++)
 		{
 			m_enemies[i].GetComponent<IAlertable>().StopAlerted();
+
+			if (m_enemies[i].GetComponent<GuardBehaviour>())
+			{
+				m_enemies[i].GetComponent<IAlertable>().StartAlerted();
+			}
 		}
 	}
 

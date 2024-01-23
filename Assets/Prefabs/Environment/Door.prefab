@@ -605,6 +605,7 @@ GameObject:
   - component: {fileID: 166486949522428653}
   - component: {fileID: 9179377108479406370}
   - component: {fileID: 7850534516765790997}
+  - component: {fileID: 4089930750196842048}
   m_Layer: 8
   m_Name: Door Panel
   m_TagString: Untagged
@@ -830,6 +831,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!208 &4089930750196842048
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4508437840050600537}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &4643722665788298489
 GameObject:
   m_ObjectHideFlags: 0

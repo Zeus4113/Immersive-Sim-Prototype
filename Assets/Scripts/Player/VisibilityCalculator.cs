@@ -10,16 +10,22 @@ public class VisibilityCalculator : MonoBehaviour
 
 	[SerializeField] private float raycastWeighting = 1f;
 	[SerializeField] private float speedWeighting = 1f;
-
 	[SerializeField] private floatEvent updateHud;
 
-	private RaycastCheck playerRaycastCheck;
+	[SerializeField] private bool m_isAwake = false;
+
 	private Rigidbody m_rb;
-
-	private TextureDetector playerTextureDetector;
 	private List<PlayerDetector> lightSources = new List<PlayerDetector>();
-
 	private float m_visibilityLevel = 0f;
+
+	private void Awake()
+	{
+		if (m_isAwake)
+		{
+			m_rb = GetComponentInParent<Rigidbody>();
+			StartCoroutine(CalculateVisibility());
+		}
+	}
 
 	public void Init(Player.Controller controller)
 	{
@@ -38,8 +44,13 @@ public class VisibilityCalculator : MonoBehaviour
 			velocity = m_rb.velocity.magnitude;
 			m_visibilityLevel = DetermineTotalVisibility(DetermineRaycastVisibility(), velocity);
 
-			if(m_flashlightEnabled) updateHud.Invoke((m_visibilityLevel + 30) / 100);
-			else updateHud.Invoke(m_visibilityLevel / 100);
+			Debug.Log(gameObject.name + " - Visibility: " + m_visibilityLevel);
+
+			if (!m_isAwake)
+			{
+				if (m_flashlightEnabled) updateHud.Invoke((m_visibilityLevel + 75) / 100);
+				else updateHud.Invoke(m_visibilityLevel / 100);
+			}
 
 			yield return new WaitForSeconds(0.01f);
 		}

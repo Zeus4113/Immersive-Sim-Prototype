@@ -13,6 +13,8 @@ namespace Enemy
 		public event Disturbance perceptionAlerted;
 		public event Disturbance perceptionLost;
 
+		public event Disturbance perceptionTick;
+
 		float m_updateTime = 0.1f;
 		PerceptionDataScriptableObject m_data;
 
@@ -21,6 +23,7 @@ namespace Enemy
 
 		bool c_isLooking = false;
 		Coroutine c_looking;
+
 
 		public void Init(PerceptionDataScriptableObject data)
 		{
@@ -64,8 +67,8 @@ namespace Enemy
 
 		IEnumerator Looking()
 		{
-			LayerMask mask = LayerMask.GetMask("Player");
-			LayerMask rayMask = LayerMask.GetMask("Player", "Environment");
+			LayerMask mask = LayerMask.GetMask("Player" , "DeadBodies");
+			LayerMask rayMask = LayerMask.GetMask("Player", "DeadBodies", "Environment");
 
 
 			while (c_isLooking)
@@ -90,8 +93,28 @@ namespace Enemy
 
 						if (hit.collider == c)
 						{
-							float visibility = hit.collider.GetComponent<VisibilityCalculator>().GetVisibility();
-							if (visibility > m_data.lookThreshold) perceptionAlerted?.Invoke((visibility * m_visibilityModifier), hit.transform.position);
+							if (hit.collider.GetComponent<VisibilityCalculator>())
+							{
+								float visibility = hit.collider.GetComponent<VisibilityCalculator>().GetVisibility();
+
+								if (visibility > m_data.lookThreshold)
+								{
+									perceptionAlerted?.Invoke((visibility * m_visibilityModifier), hit.transform.position);
+									m_playerRef = hit.collider.transform;
+								}
+
+								if (m_data.hasPeripherals && Vector3.Distance(transform.position, hit.collider.transform.position) < m_data.peripheralDistance && visibility > m_data.peripheralThreshold)
+								{
+									perceptionAlerted?.Invoke((100), hit.transform.position);
+									m_playerRef = hit.collider.transform;
+								}
+
+							}
+							else if(hit.collider.gameObject.layer == LayerMask.NameToLayer("DeadBodies"))
+							{
+								perceptionAlerted?.Invoke((100), hit.transform.position);
+							}
+
 							StopDecay();
 						}
 					}
@@ -195,7 +218,14 @@ namespace Enemy
 
 							if (audioManager != null) volume *= audioManager.GetModifier();
 
-							if (volume > m_data.listenThreshold) perceptionAlerted?.Invoke(volume * m_volumeModifier, c.transform.position);
+							Debug.Log(volume);
+							Debug.Log(m_data.listenThreshold);
+
+							if (volume > m_data.listenThreshold)
+							{
+								perceptionAlerted?.Invoke(volume * m_volumeModifier, c.transform.position); 
+								perceptionTick?.Invoke(volume * m_volumeModifier, c.transform.position);
+							}
 						}
 					}
 				}

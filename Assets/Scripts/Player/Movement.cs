@@ -69,8 +69,6 @@ namespace Player
 		private bool isGrounded;
 		private bool canJump = true;
 
-
-
 		public void Init(PlayerInput playerInput, Player.Controller controller)
 		{
 			m_playerInput = playerInput;
@@ -91,10 +89,12 @@ namespace Player
 			SetMovementMode(MovementStates.normal);
 		}
 
-		private void EnableInputEvents(bool isTrue)
+		public void EnableInputEvents(bool isTrue)
 		{
 			if (isTrue)
 			{
+				Cursor.lockState = CursorLockMode.Locked;
+
 				m_playerInput.actions.FindAction("Movement").performed += StartMovement;
 				m_playerInput.actions.FindAction("Movement").canceled += StopMovement;
 
@@ -139,7 +139,10 @@ namespace Player
 
 				m_playerInput.actions.FindAction("Lean").performed -= StartPlayerLean;
 				m_playerInput.actions.FindAction("Lean").canceled -= StopPlayerLean;
+
+				Cursor.lockState = CursorLockMode.Confined;
 			}
+
 		}
 
 		bool c_isMoving = false;
@@ -153,17 +156,16 @@ namespace Player
 			m_leanAmount = 0.5f * -direction;
 		}
 
-		public float GetLeanAmount()
-		{
-			return m_leanAmount;
-		}
-
 		public void StopPlayerLean(InputAction.CallbackContext ctx)
 		{
 			float direction = ctx.ReadValue<float>();
 			m_leanAmount = 0.5f * -direction;
 		}
 
+		public float GetLeanAmount()
+		{
+			return m_leanAmount;
+		}
 
 		void StartMovement(InputAction.CallbackContext ctx)
 		{
@@ -196,7 +198,13 @@ namespace Player
 			{
 				currentMovementValue = ctx.ReadValue<Vector2>();
 				Vector3 direction = playerRigidbody.rotation * new Vector3(currentMovementValue.x, 0, currentMovementValue.y);
-				Vector3 velocity = direction * currentMovementSpeed * 100 * Time.fixedDeltaTime;
+
+				Vector3 velocity = Vector3.zero;
+
+				if (!m_isPickingUp) velocity = direction * currentMovementSpeed * 100 * Time.fixedDeltaTime;
+
+				else if (m_isPickingUp) velocity = direction * currentMovementSpeed * 50 * Time.fixedDeltaTime;
+
 				velocity.y = playerRigidbody.velocity.y;
 				playerRigidbody.velocity = velocity;
 
@@ -321,6 +329,13 @@ namespace Player
 			Vector3 currentRotationalValue = playerCamera.transform.rotation.eulerAngles;
 			float clampedValue = MathTools.ClampAngle(currentRotationalValue.x - (inputCameraRotationValue * mouseSensitivityCamera), minCameraRotation, maxCameraRotation);
 			playerCamera.transform.localRotation = Quaternion.Euler(clampedValue, 0, 0);
+		}
+
+		bool m_isPickingUp = false;
+
+		public void IsPickedUp(bool isTrue)
+		{
+			m_isPickingUp = isTrue;
 		}
 
 		private void SetMovementMode(MovementStates newState)

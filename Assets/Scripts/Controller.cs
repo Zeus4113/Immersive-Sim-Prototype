@@ -31,6 +31,10 @@ namespace Player
 			m_visibilityCalculator.Init(this);
 			m_interact.Init(m_input, this);
 			m_toolset.Init(m_input, this);
+			m_healthComponent.Init(this);
+
+			m_healthComponent.playerDead += m_movement.EnableInputEvents;
+			m_healthComponent.playerDead += m_gameManager.GetUIManager().PlayerDead;
 
 			//m_audioManager.Init(m_movement, this);
 		}

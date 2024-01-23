@@ -9,6 +9,9 @@ public class HealthComponent : MonoBehaviour
     public delegate void OnHealthChange(float health);
     public event OnHealthChange healthChange;
 
+	public delegate void OnDeath(bool isDead);
+	public event OnDeath playerDead;
+
     [SerializeField] private float m_maxHealth = 100f;
 
     private float m_currentHealth;
@@ -25,6 +28,8 @@ public class HealthComponent : MonoBehaviour
         m_currentHealth -= damage;
         Mathf.Clamp(m_currentHealth, 0, m_maxHealth);
         healthChange?.Invoke(m_currentHealth);
+
+		IsAlive();
     }
 
     public void SetHealth(float health)
@@ -32,10 +37,18 @@ public class HealthComponent : MonoBehaviour
         m_currentHealth = health;
         Mathf.Clamp(m_currentHealth, 0, m_maxHealth);
         healthChange?.Invoke(m_currentHealth);
-    }
+
+		IsAlive();
+	}
 
     public bool IsAlive()
     {
-        return m_currentHealth > 0;
+		if (m_currentHealth > 0)
+		{
+			return true;
+		}
+
+		playerDead?.Invoke(false);
+		return false;
     }
 }

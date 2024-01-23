@@ -11,6 +11,7 @@ namespace Enemy
         [Header("References")]
         [SerializeField] private Transform m_patrolPathHolder;
         [SerializeField] private NavMeshAgent m_agent;
+		[SerializeField] private GameObject m_deadBody;
         [Space(2)]
 
         [Header("Floats")]
@@ -18,6 +19,21 @@ namespace Enemy
         [SerializeField] private float m_investigatingWaitTime;
         [SerializeField] private float m_attackDistance;
         [SerializeField] private float m_attackDamage;
+
+		[Header("Meshes")]
+		[SerializeField] private MeshRenderer[] m_eyeMeshes;
+
+		[Header("Gun")]
+		[SerializeField] private Transform m_gunTransform;
+		[SerializeField] private Transform m_holsterTransform;
+		[SerializeField] private Transform m_heldTransform;
+		[SerializeField] private ParticleSystem m_muzzleFlash;
+		[SerializeField] private AudioSource m_gunSound;
+
+		[Header("Materials")]
+		[SerializeField] private Material m_redMaterial;
+		[SerializeField] private Material m_yellowMaterial;
+		[SerializeField] private Material m_greenMaterial;
 
         bool c_isPatrolling = false;
         Coroutine c_patrolling;
@@ -27,6 +43,30 @@ namespace Enemy
 
         bool c_isPursuing = false;
         Coroutine c_pursuing;
+
+
+		private void SetMeshColour(string colorName)
+		{
+			Material mat = m_redMaterial;
+
+			switch (colorName.ToLower())
+			{
+				case "red":
+					mat = m_redMaterial;
+					break;
+				case "yellow":
+					mat = m_yellowMaterial;
+					break;
+				case "green":
+					mat = m_greenMaterial;
+					break;
+			}
+
+			for(int i = 0; i < m_eyeMeshes.Length; i++)
+			{
+				m_eyeMeshes[i].material = mat;
+			}
+		}
 
         private void StopActionCoroutines()
         {
@@ -47,8 +87,9 @@ namespace Enemy
 
             StopActionCoroutines();
             c_patrolling = StartCoroutine(Patrolling(GetWaypoints()));
+			SetMeshColour("green");
 
-            Debug.Log("Action - Patrolling");
+			Debug.Log("Action - Patrolling");
         }
 
         public void StopPatrolling()
@@ -72,8 +113,9 @@ namespace Enemy
 
             StopActionCoroutines();
             c_investigating = StartCoroutine(Investigating(target));
+			SetMeshColour("Yellow");
 
-            Debug.Log("Action - Investigating");
+			Debug.Log("Action - Investigating");
         }
 
         public void StopInvestigating()
@@ -97,8 +139,9 @@ namespace Enemy
 
             StopActionCoroutines();
             c_pursuing = StartCoroutine(Pursuing(player));
+			SetMeshColour("red");
 
-            Debug.Log("Action - Pursuing");
+			Debug.Log("Action - Pursuing");
         }
 
         public void StopPursuing()
@@ -120,7 +163,8 @@ namespace Enemy
 
             while (c_isPatrolling)
             {
-                m_agent.destination = nextPosition;
+				DrawGun(false);
+				m_agent.destination = nextPosition;
 
                 if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(nextPosition.x, nextPosition.z)) < 0.25f)
                 {
@@ -133,17 +177,22 @@ namespace Enemy
             }
         }
 
+		Vector3 m_investigationPosition = Vector3.zero;
+
         IEnumerator Investigating(Vector3 targetPosition)
         {
             Vector3 investigationPosition = targetPosition;
+			m_investigationPosition = targetPosition;
 
-            Vector3[] pointsInArea = GetRandomPointsInArea(investigationPosition, 5, 2f);
+			Vector3[] pointsInArea = GetRandomPointsInArea(investigationPosition, 5, 2f);
 
             int pointsInAreaIndex = 0;
 
             while (c_isInvestigating)
             {
-                m_agent.destination = investigationPosition;
+				DrawGun(false);
+
+				m_agent.destination = investigationPosition;
 
                 if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(investigationPosition.x, investigationPosition.z)) < 0.25f)
                 {
@@ -163,6 +212,8 @@ namespace Enemy
 
             while (c_isPursuing && trackingPlayer)
             {
+				DrawGun(true);
+
                 if (playerTransform == null) trackingPlayer = false;
 
                 playerPosition = playerTransform.position;
@@ -176,6 +227,20 @@ namespace Enemy
                 yield return new WaitForFixedUpdate();
             }
         }
+
+		void DrawGun(bool isDrawn)
+		{
+			if (isDrawn && m_gunTransform != m_heldTransform)
+			{
+				m_gunTransform.position = Vector3.Lerp(m_gunTransform.position, m_heldTransform.position, Time.fixedDeltaTime * 3);
+				m_gunTransform.rotation = Quaternion.Lerp(m_gunTransform.rotation, m_heldTransform.rotation, Time.fixedDeltaTime * 3);
+			}
+			else if (!isDrawn && m_gunTransform != m_holsterTransform)
+			{
+				m_gunTransform.position = Vector3.Lerp(m_gunTransform.position, m_holsterTransform.position, Time.fixedDeltaTime * 3);
+				m_gunTransform.rotation = Quaternion.Lerp(m_gunTransform.rotation, m_holsterTransform.rotation, Time.fixedDeltaTime * 3);
+			}
+		}
 
         Vector3[] GetWaypoints()
         {
@@ -202,9 +267,12 @@ namespace Enemy
 
                 Debug.Log(randomPoints[i]);
 
-                while (path.status != NavMeshPathStatus.PathComplete)
+				int counter = 0;
+				
+                while (path.status != NavMeshPathStatus.PathComplete && counter < 100)
                 {
-                    randomPoints[i] = centre + new Vector3(Random.insideUnitCircle.x * radius, centre.y, Random.insideUnitCircle.y * radius);
+					counter++;
+					randomPoints[i] = centre + new Vector3(Random.insideUnitCircle.x * radius, centre.y, Random.insideUnitCircle.y * radius);
                     m_agent.CalculatePath(randomPoints[i], path);
                 }
             }
@@ -222,11 +290,60 @@ namespace Enemy
 
             HealthComponent health = hit.collider.GetComponent<HealthComponent>();
 
-            if(health != null)
+            if(health != null && health.IsAlive())
             {
-                health.Damage(m_attackDamage);
+				m_muzzleFlash.Play();
+				m_gunSound.Play();
+				health.Damage(m_attackDamage);
             }
         }
+
+		public Vector3 GetInvestigationPosition()
+		{
+			return m_investigationPosition;
+		}
+
+		public void GuardUnconcious()
+		{
+			if(this.GetComponent<GuardBehaviour>().GetAlertLevel() != AlertLevel.alerted)
+			{
+				Instantiate(m_deadBody, transform.position, transform.rotation);
+				Destroy(gameObject);
+			}
+		}
+
+		bool c_isCounting = false;
+		Coroutine c_counting;
+
+		public void StartCountdown()
+		{
+			if (c_isCounting) return;
+			c_isCounting = true;
+
+			if (c_counting != null) return;
+			c_counting = StartCoroutine(Countdown());
+		}
+
+		public void StopCountdown()
+		{
+			if (!c_isCounting) return;
+			c_isCounting = false;
+
+			if (c_counting == null) return;
+			StopCoroutine(c_counting);
+			c_counting = null;
+		}
+
+		IEnumerator Countdown()
+		{
+			yield return new WaitForSeconds(5f);
+
+			GuardUnconcious();
+			StopCountdown();
+		}
+
     }
+
+
 }
 

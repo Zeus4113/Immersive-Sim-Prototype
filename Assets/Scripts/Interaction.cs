@@ -13,6 +13,9 @@ namespace Player
 		private PlayerInput m_input;
 		private Controller m_controller;
 
+		[SerializeField] private Transform m_pickupTransform;
+		[SerializeField] private Transform m_dropTransform;
+
 		public void Init(PlayerInput playerInput, Player.Controller controller)
 		{
 			m_input = playerInput;
@@ -26,13 +29,53 @@ namespace Player
 
 		void OnInteraction(InputAction.CallbackContext ctx)
 		{
-			foreach (GameObject x in m_interactables)
+			if (m_pickedObject != null && m_isPickedUp)
 			{
-				if(x.GetComponent<IInteractable>() != null)
+				m_pickedObject.Interact(this);
+			}
+			else
+			{
+				foreach (GameObject x in m_interactables)
 				{
-					x.GetComponent<IInteractable>().Interact(this);
+					if (x.GetComponent<IInteractable>() != null)
+					{
+						x.GetComponent<IInteractable>().Interact(this);
+					}
 				}
 			}
+		}
+
+		public Transform GetPickedUpTransform()
+		{
+			return m_pickupTransform;
+		}
+
+		public Transform GetDroppedTransform()
+		{
+			return m_dropTransform;
+		}
+
+
+
+		bool m_isPickedUp = false;
+		IInteractable m_pickedObject = null;
+
+		public void OnPickedUp(GameObject myObject)
+		{
+			m_controller.GetMovement().IsPickedUp(true);
+			m_isPickedUp = true;
+			m_pickedObject = myObject.GetComponent<IInteractable>();
+			UpdateIcon?.Invoke(myObject);
+			StopChecking();
+		}
+
+		public void OnDropped()
+		{
+			m_controller.GetMovement().IsPickedUp(false);
+			m_isPickedUp = false;
+			m_pickedObject = null;
+			UpdateIcon?.Invoke(null);
+			StartChecking();
 		}
 
 		// Checking Coroutine
@@ -85,8 +128,8 @@ namespace Player
 
 			if (hit.collider != other) return;
 			m_interactables.Add(hit.collider.gameObject);
-			StartChecking();
 
+			if(!m_isPickedUp) StartChecking();
 		}
 
 		private void OnTriggerExit(Collider other)

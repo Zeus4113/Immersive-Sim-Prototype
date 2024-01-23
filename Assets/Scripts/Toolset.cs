@@ -19,6 +19,7 @@ namespace Player
 		private Flashlight m_flashlight;
 		private Lockpick m_lockpick;
 		private Keychain m_keychain;
+		private Whacker m_whacker;
 
 		public Controller GetController()
 		{
@@ -30,6 +31,9 @@ namespace Player
 			lockpick,
 			keychain,
 			flashlight,
+			whacker,
+			dartgun,
+			flashbang
 		}
 
 		Tools m_currentTool;
@@ -46,6 +50,9 @@ namespace Player
 				m_input.actions.FindAction("Use Tool").performed += UseTool;
 				m_input.actions.FindAction("Use Tool").canceled += CancelTool;
 			}
+
+			m_whacker = GetComponentInChildren<Whacker>();
+			m_whacker.Init(this);
 
 			m_flashlight = GetComponentInChildren<Flashlight>();
 			m_flashlight.Init(this);
@@ -75,6 +82,11 @@ namespace Player
 			return m_keychain;
 		}
 
+		public Whacker GetWhacker()
+		{
+			return m_whacker;
+		}
+
 		void UseTool(InputAction.CallbackContext ctx)
 		{
 			switch (m_currentTool)
@@ -90,6 +102,9 @@ namespace Player
 				case Tools.flashlight:
 					m_flashlight.ToggleFlashlight();
 					break;
+				case Tools.whacker:
+					m_whacker.StartCharge();
+					break;
 			}
 		}
 
@@ -99,6 +114,10 @@ namespace Player
 			{
 				case Tools.lockpick:
 					m_lockpick.StopLockpicking();
+					break;
+				case Tools.whacker:
+					m_whacker.StopCharge();
+					m_whacker.Attack();
 					break;
 				default:
 					break;
@@ -152,16 +171,27 @@ namespace Player
 
 					Debug.LogWarning("Current Angle: " + angle);
 
+					int toolAmount = 6;
+
 					switch (angle)
 					{
-						case float x when (x >= 300 && x < 360) || (x >= 0 && x < 60):
-							m_currentTool = Tools.flashlight;
+						case float x when (x >= 0 && x < (360 / toolAmount) * 1):
+							m_currentTool = Tools.flashbang;
 							break;
-						case float x when (x >= 60 && x < 180):
+						case float x when (x >= (360 / toolAmount) * 1 && x < (360 / toolAmount) * 2):
+							m_currentTool = Tools.dartgun;
+							break;
+						case float x when (x >= (360 / toolAmount) * 2 && x < (360 / toolAmount) * 3):
+							m_currentTool = Tools.whacker;
+							break;
+						case float x when (x >= (360 / toolAmount) * 3 && x < (360 / toolAmount) * 4):
 							m_currentTool = Tools.lockpick;
 							break;
-						case float x when (x >= 180 && x < 300):
+						case float x when (x >= (360 / toolAmount) * 4 && x < (360 / toolAmount) * 5):
 							m_currentTool = Tools.keychain;
+							break;
+						case float x when (x >= (360 / toolAmount) * 5 && x <= (360 / toolAmount) * 6):
+							m_currentTool = Tools.flashlight;
 							break;
 						default:
 							break;

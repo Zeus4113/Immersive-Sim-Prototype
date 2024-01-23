@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour
 	private MissionScore m_missionScore;
 	private HintPopup m_hintPopup;
 	private ToolMenu m_toolMenu;
+	private DeathScreen m_deathScreen;
 
 	public void Init(GameManager gm)
 	{
@@ -25,6 +26,7 @@ public class UIManager : MonoBehaviour
 		m_missionScore = transform.Find("Mission Score").GetComponent<MissionScore>();
 		m_hintPopup = transform.Find("Hint Popup").GetComponent<HintPopup>();
 		m_toolMenu = transform.Find("Tool Menu").GetComponent<ToolMenu>();
+		m_deathScreen = transform.Find("Death Screen").GetComponent<DeathScreen>();
 
 		SetupHUD();
 
@@ -53,6 +55,16 @@ public class UIManager : MonoBehaviour
 	{
 		m_interactIcon.ToggleInteract(false);
 		m_hintPopup.DisplayHint(null);
+	}
+
+	public void PlayerDead(bool isAlive)
+	{
+		m_deathScreen.gameObject.SetActive(!isAlive);
+	}
+
+	public DeathScreen GetDeathScreen()
+	{
+		return m_deathScreen;
 	}
 
 	public VisibilityMeter GetVisibilityMeter()

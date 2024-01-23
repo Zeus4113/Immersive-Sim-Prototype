@@ -8,6 +8,7 @@ public class SecurityAlarm : MonoBehaviour, IAlertable
 	//public delegate void Alert(GameObject alertObject);
 	//public event Alert alertTriggered;
 
+	private EnemyManager m_enemyManager;
 	public event IAlertable.Alert alertTriggered;
 
 	[Header("Floats")]
@@ -41,8 +42,9 @@ public class SecurityAlarm : MonoBehaviour, IAlertable
 	Coroutine c_alerted;
 	float m_alertTime;
 
-	private void Awake()
+	public void Init(EnemyManager em)
 	{
+		m_enemyManager = em;
 		m_perception.Init(m_perceptionData, m_updateTime);
 		m_perception.perceptionAlerted += StartAlerted;
 

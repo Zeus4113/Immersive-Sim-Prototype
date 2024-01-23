@@ -9,6 +9,7 @@ public class SecurityCamera : MonoBehaviour, IAlertable
 	//public event Alert alertTriggered;
 
 	public event IAlertable.Alert alertTriggered;
+	private EnemyManager m_enemyManager;
 
 	[Header("Floats")]
 	[SerializeField] private float m_updateTime = 0.1f;
@@ -49,8 +50,9 @@ public class SecurityCamera : MonoBehaviour, IAlertable
 		}
 	}
 
-	private void Awake()
+	public void Init(EnemyManager em)
 	{
+		m_enemyManager = em;
 		//m_initialRotation = transform.rotation.y;
 
 		Debug.Log(gameObject.name + " Rotation " + m_initialRotation);

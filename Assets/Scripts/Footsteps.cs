@@ -61,7 +61,7 @@ public class Footsteps : MonoBehaviour
 			m_audioSource.clip = DetermineAudioClip(m_rigidbodyChecker.GetTag());
 			m_audioSource.volume = 1f * DetermineVolumeModifer(m_rigidbodyChecker.GetTag());
 			m_audioSource.Play();
-			Debug.Log("Jump Sound");
+			//Debug.Log("Jump Sound");
 		}
 
 	}
@@ -104,7 +104,7 @@ public class Footsteps : MonoBehaviour
 
 			m_steppingDistance += velocity.magnitude * halfstepSwitcher * Time.fixedDeltaTime;
 
-			Debug.Log("Is Walking: " + m_steppingDistance);
+			//Debug.Log("Is Walking: " + m_steppingDistance);
 
 			if (m_steppingDistance >= m_stepDistance)
 			{
@@ -113,7 +113,7 @@ public class Footsteps : MonoBehaviour
 				m_audioSource.clip = DetermineAudioClip(m_rigidbodyChecker.GetTag());
 				m_audioSource.volume = (velocity.magnitude * 0.1f) * DetermineVolumeModifer(m_rigidbodyChecker.GetTag());
 				m_audioSource.Play();
-				Debug.Log("Footstep Sound Firing");
+				//Debug.Log("Footstep Sound Firing");
 			}
 
 			if (m_steppingDistance <= 0)

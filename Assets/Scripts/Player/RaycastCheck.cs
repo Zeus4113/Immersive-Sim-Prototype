@@ -77,18 +77,29 @@ public class RaycastCheck : MonoBehaviour
 	public float RaycastToLightSource(Transform lightSource)
 	{
 		float hitCount = 0f;
+		string[] layers = new string[]
+		{
+			"Player",
+			"Environment",
+			"Enemies" ,
+			"Interactables",
+		};
 
 		// Check Sensors
+		LayerMask mask = LayerMask.GetMask(layers);
+		//Debug.LogWarning("Layer Mask: " + mask.value);
 
 		for (int i = 0; i < sensorCount; i++)
 		{
 			RaycastHit hit;
-			Physics.Raycast(lightSource.position, (raycastOrigins[i].position - lightSource.position).normalized, out hit);
+			Physics.Raycast(lightSource.position, (raycastOrigins[i].position - lightSource.position).normalized, out hit, 10000, mask);
 			Debug.DrawLine(lightSource.position, raycastOrigins[i].position, Color.red, 0.1f);
 
 			if (hit.collider != null)
 			{
-				if (hit.transform.CompareTag("Player")) { hitCount += (1 * m_sensorWeightings[i]); };
+				if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) { hitCount += (1 * m_sensorWeightings[i]); }
+				else Debug.Log(hit.collider.gameObject);
+
 			}
 		}
 
@@ -96,13 +107,20 @@ public class RaycastCheck : MonoBehaviour
 
 		float currentVisbility = hitCount;
 
+		//Debug.Log("Hit Count: " + hitCount);
+
 		float distance = Vector3.Distance(transform.position, lightSource.position);
 
-		float intensity = lightSource.GetComponentInChildren<Light>().intensity;
+		Light light = lightSource.GetComponent<Light>();
+		if (light == null) light = lightSource.GetComponentInChildren<Light>();
+
+		float intensity = light.intensity;
+
+		//Debug.Log("Light Source: " + light + " " + intensity);
 
 		// Light Types
 
-		if (lightSource.GetComponentInChildren<Light>().type == LightType.Point)
+		if (light.type == LightType.Point)
 		{
 			//float squareDistance = distance * distance;
 
@@ -111,7 +129,7 @@ public class RaycastCheck : MonoBehaviour
 			currentVisbility = (currentVisbility * inverseSquareIntensity);
 		}
 
-		else if(lightSource.GetComponentInChildren<Light>().type == LightType.Spot)
+		else if(light.type == LightType.Spot)
 		{
 			float inverseSquareIntensity = intensity / distance;
 
