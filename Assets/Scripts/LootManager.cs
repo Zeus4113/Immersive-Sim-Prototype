@@ -11,6 +11,11 @@ public class LootManager : MonoBehaviour
 	public event ScoreChange ScoreIncrease;
 
 	private List<Loot> m_lootList = new List<Loot>();
+
+	private List<Door> m_doorList = new List<Door>();
+
+	private List<Key> m_keyList = new List<Key>();
+ 
 	private int m_currentScore = 0;
 	private int m_totalScore = 0;
 	private int m_requiredItemTotal = 0;
@@ -25,6 +30,8 @@ public class LootManager : MonoBehaviour
 
 		m_gameManager = gm;
 		m_lootList.AddRange(transform.GetComponentsInChildren<Loot>());
+		m_keyList.AddRange(transform.GetComponentsInChildren<Key>());
+		m_doorList.AddRange(transform.GetComponentsInChildren<Door>());
 
 		for(int i = 0; i < m_lootList.Count; i++)
 		{
@@ -35,6 +42,13 @@ public class LootManager : MonoBehaviour
 			m_totalScore += m_lootList[i].GetValue();
 		}
 
+		for(int i = 0; i < m_keyList.Count; i++)
+		{
+			m_keyList[i].Init(this);
+
+			if (m_keyList[i].IsRequired()) m_requiredItemTotal++;
+		}
+
 		Debug.Log("Total Score: " + m_totalScore);
 	}
 
@@ -43,7 +57,7 @@ public class LootManager : MonoBehaviour
 		m_lootList.Add(newItem);
 	}
 
-	public void Remove(Loot newItem)
+	public void RemoveLoot(Loot newItem)
 	{
 		m_currentScore += newItem.GetValue();
 
@@ -51,6 +65,12 @@ public class LootManager : MonoBehaviour
 		ScoreIncrease?.Invoke(m_currentScore);
 
 		m_lootList.Remove(newItem);
+	}
+
+	public void RemoveKey(Key newKey)
+	{
+		if (newKey.IsRequired()) m_currentRequiredItems++;
+		m_keyList.Remove(newKey);
 	}
 
 	public float GetScore()

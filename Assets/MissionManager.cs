@@ -1,27 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-struct MissionData
-{
-	public float scorePercentage;
-	public int alarmsTriggered;
-	public int guardsAlerted;
-}
 
 public class MissionManager : MonoBehaviour
 {
-	[SerializeField] EnemyManager m_enemyManager;
-	[SerializeField] LootManager m_lootManager;
+	private GameManager m_gameManager;
+	private EnemyManager m_enemyManager;
+	private LootManager m_lootManager;
 
 	[SerializeField] float m_alarmPenalty = 5f;
 	[SerializeField] float m_guardPenalty = 10f;
 
-	MissionData m_missionData;
+	[SerializeField] MissionDataScriptableObject m_data;
 
-	void Init()
+	public delegate void OnMissionEnd();
+
+	public event OnMissionEnd missionComplete;
+
+	public void Init(GameManager gm, EnemyManager em, LootManager lm)
 	{
-		m_missionData = new MissionData();
+		m_gameManager = gm;
+		m_lootManager = lm;
+		m_enemyManager = em;
+
+		m_data.scorePercentage = 0f;
+		m_data.alarmsTriggered = 0;
+		m_data.guardsAlerted = 0;
+		m_data.grade = 'U';
 	}
 
 	void OnTriggerEnter(Collider other)
@@ -29,39 +36,24 @@ public class MissionManager : MonoBehaviour
 		if (m_lootManager.CheckRequiredItems())
 		{
 			SetMissionData();
-
-			char grade = CalculateGrade(GetMissionData());
-
-			Debug.LogWarning("Mission Completed:" +
-				"/n Grade : " + grade +
-				"/n Loot Percentage : " + m_missionData.scorePercentage +
-				"/n Alarms Triggered : " + m_missionData.alarmsTriggered +
-				"/n Guards Alerted : " + m_missionData.guardsAlerted);
+			m_gameManager.EnableInputEvents(false);
+			missionComplete?.Invoke();
 		}
-
-		else Debug.LogWarning("Required Items Not Found!");
-
-	}
-
-	MissionData GetMissionData()
-	{
-		return m_missionData;
 	}
 
 	void SetMissionData()
 	{
-		m_missionData.scorePercentage = m_lootManager.GetScore();
-		Debug.LogWarning("Score: " + m_lootManager.GetScore());
+		m_data.scorePercentage = m_lootManager.GetScore();
 
-		m_missionData.alarmsTriggered = m_enemyManager.GetAlarmsTripped();
-		Debug.LogWarning("Alarms: " + m_enemyManager.GetAlarmsTripped());
+		m_data.alarmsTriggered = m_enemyManager.GetAlarmsTripped();
 
-		m_missionData.guardsAlerted = m_enemyManager.GetGuardsAlerted();
-		Debug.LogWarning("Guards: " + m_enemyManager.GetGuardsAlerted());
+		m_data.guardsAlerted = m_enemyManager.GetGuardsAlerted();
+
+		m_data.grade = CalculateGrade(m_data);
 
 	}
 
-	char CalculateGrade(MissionData m)
+	char CalculateGrade(MissionDataScriptableObject m)
 	{
 		float score = m.scorePercentage;
 		

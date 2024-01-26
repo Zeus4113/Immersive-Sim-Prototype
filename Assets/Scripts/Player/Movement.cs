@@ -69,6 +69,9 @@ namespace Player
 		private bool isGrounded;
 		private bool canJump = true;
 
+		[SerializeField] private StandChecker m_standChecker;
+		[SerializeField] private GroundedChecker m_groundChecker;
+
 		public void Init(PlayerInput playerInput, Player.Controller controller)
 		{
 			m_playerInput = playerInput;
@@ -76,11 +79,14 @@ namespace Player
 
 			// Grab Components
 			playerCollider = GetComponent<Collider>();
-			playerRigidbody = GetComponent<Rigidbody>();
+			playerRigidbody = GetComponentInChildren<Rigidbody>();
 			playerMesh = GetComponentInChildren<MeshRenderer>();
 			playerCamera = GetComponentInChildren<Camera>();
 
-			if (m_playerInput != null) EnableInputEvents(true);
+			if (m_playerInput != null)
+			{
+				BindEvents();
+			}
 
 			// Lock mouse cursor
 			Cursor.lockState = CursorLockMode.Locked;
@@ -89,83 +95,32 @@ namespace Player
 			SetMovementMode(MovementStates.normal);
 		}
 
-		public void EnableInputEvents(bool isTrue)
+		void BindEvents()
 		{
-			if (isTrue)
-			{
-				Cursor.lockState = CursorLockMode.Locked;
 
-				m_playerInput.actions.FindAction("Movement").performed += StartMovement;
-				m_playerInput.actions.FindAction("Movement").canceled += StopMovement;
+			m_playerInput.actions.FindAction("Movement").performed += StartMovement;
+			m_playerInput.actions.FindAction("Movement").canceled += StopMovement;
 
-				m_playerInput.actions.FindAction("Rotation").performed += StartRotation;
-				m_playerInput.actions.FindAction("Rotation").canceled += StopRotation;
+			m_playerInput.actions.FindAction("Rotation").performed += StartRotation;
+			m_playerInput.actions.FindAction("Rotation").canceled += StopRotation;
 
-				m_playerInput.actions.FindAction("Jump").performed += OnJump;
+			m_playerInput.actions.FindAction("Jump").performed += OnJump;
 
-				m_playerInput.actions.FindAction("Crouch").performed += OnCrouch;
-				m_playerInput.actions.FindAction("Crouch").canceled += OnCrouch;
+			m_playerInput.actions.FindAction("Crouch").performed += OnCrouch;
+			m_playerInput.actions.FindAction("Crouch").canceled += OnCrouch;
 
-				m_playerInput.actions.FindAction("Walk").performed += OnWalk;
-				m_playerInput.actions.FindAction("Walk").canceled += OnWalk;
+			m_playerInput.actions.FindAction("Walk").performed += OnWalk;
+			m_playerInput.actions.FindAction("Walk").canceled += OnWalk;
 
-				m_playerInput.actions.FindAction("Run").performed += OnRun;
-				m_playerInput.actions.FindAction("Run").canceled += OnRun;
+			m_playerInput.actions.FindAction("Run").performed += OnRun;
+			m_playerInput.actions.FindAction("Run").canceled += OnRun;
 
-				m_playerInput.actions.FindAction("Tool Menu").performed += ShowMenu;
-				m_playerInput.actions.FindAction("Tool Menu").canceled += RemoveMenu;
-
-				m_playerInput.actions.FindAction("Lean").performed += StartPlayerLean;
-				m_playerInput.actions.FindAction("Lean").canceled += StopPlayerLean;
-			}
-			else if (!isTrue)
-			{
-				m_playerInput.actions.FindAction("Movement").performed -= StartMovement;
-				m_playerInput.actions.FindAction("Movement").canceled -= StopMovement;
-
-				m_playerInput.actions.FindAction("Rotation").performed -= StartRotation;
-				m_playerInput.actions.FindAction("Rotation").canceled -= StopRotation;
-
-				m_playerInput.actions.FindAction("Jump").performed -= OnJump;
-
-				m_playerInput.actions.FindAction("Crouch").performed -= OnCrouch;
-				m_playerInput.actions.FindAction("Crouch").canceled -= OnCrouch;
-
-				m_playerInput.actions.FindAction("Walk").performed -= OnWalk;
-				m_playerInput.actions.FindAction("Walk").canceled -= OnWalk;
-
-				m_playerInput.actions.FindAction("Run").performed -= OnRun;
-				m_playerInput.actions.FindAction("Run").canceled -= OnRun;
-
-				m_playerInput.actions.FindAction("Lean").performed -= StartPlayerLean;
-				m_playerInput.actions.FindAction("Lean").canceled -= StopPlayerLean;
-
-				Cursor.lockState = CursorLockMode.Confined;
-			}
-
+			m_playerInput.actions.FindAction("Tool Menu").performed += ShowMenu;
+			m_playerInput.actions.FindAction("Tool Menu").canceled += RemoveMenu;
 		}
 
 		bool c_isMoving = false;
 		Coroutine c_moving;
-
-		float m_leanAmount = 0f;
-
-		public void StartPlayerLean(InputAction.CallbackContext ctx)
-		{
-			float direction = ctx.ReadValue<float>();
-			m_leanAmount = 0.5f * -direction;
-		}
-
-		public void StopPlayerLean(InputAction.CallbackContext ctx)
-		{
-			float direction = ctx.ReadValue<float>();
-			m_leanAmount = 0.5f * -direction;
-		}
-
-		public float GetLeanAmount()
-		{
-			return m_leanAmount;
-		}
 
 		void StartMovement(InputAction.CallbackContext ctx)
 		{
@@ -294,7 +249,7 @@ namespace Player
 				Quaternion rotation = Quaternion.Euler(new Vector3(0, playerRotationValue * mouseSensitivityPlayer, 0) * Time.fixedDeltaTime);
 				playerRigidbody.MoveRotation(playerRigidbody.rotation * rotation);
 
-				RotateCamera(cameraRotationValue);
+				//RotateCamera(cameraRotationValue);
 				yield return new WaitForFixedUpdate();
 			}
 
@@ -324,12 +279,20 @@ namespace Player
 			isGrounded = isTrue;
 		}
 
-		private void RotateCamera(float inputCameraRotationValue)
-		{
-			Vector3 currentRotationalValue = playerCamera.transform.rotation.eulerAngles;
-			float clampedValue = MathTools.ClampAngle(currentRotationalValue.x - (inputCameraRotationValue * mouseSensitivityCamera), minCameraRotation, maxCameraRotation);
-			playerCamera.transform.localRotation = Quaternion.Euler(clampedValue, 0, 0);
-		}
+		float clampedValue = 0f;
+
+		//private void RotateCamera(float inputCameraRotationValue)
+		//{
+		//	Vector3 currentRotationalValue = playerCamera.transform.rotation.eulerAngles;
+		//	float clampedValue = MathTools.ClampAngle(currentRotationalValue.x - (inputCameraRotationValue * mouseSensitivityCamera), minCameraRotation, maxCameraRotation);
+		//	playerCamera.transform.localRotation = Quaternion.Euler(clampedValue, 0, 0);
+		//}
+
+
+		//public float GetCameraRotation()
+		//{
+		//	return clampedValue;
+		//}
 
 		bool m_isPickingUp = false;
 
@@ -343,31 +306,31 @@ namespace Player
 			switch (newState)
 			{
 				case MovementStates.normal:
-					SetCapsule("standing");
+					//SetCapsule("standing");
 					SetSpeed(1f);
 					currentMovementState = MovementStates.normal;
 					break;
 
 				case MovementStates.walking:
-					SetCapsule("standing");
+					//SetCapsule("standing");
 					SetSpeed(walkSpeedModifier);
 					currentMovementState = MovementStates.walking;
 					break;
 
 				case MovementStates.running:
-					SetCapsule("standing");
+					//SetCapsule("standing");
 					SetSpeed(runSpeedModifier);
 					currentMovementState = MovementStates.running;
 					break;
 
 				case MovementStates.crouched:
-					SetCapsule("crouching");
+					//SetCapsule("crouching");
 					SetSpeed(crouchSpeedModifer);
 					currentMovementState = MovementStates.crouched;
 					break;
 
 				case MovementStates.crouchedWalking:
-					SetCapsule("crouching");
+					//SetCapsule("crouching");
 					SetSpeed(crouchWalkSpeedModifer);
 					currentMovementState = MovementStates.crouchedWalking;
 					break;
@@ -406,20 +369,10 @@ namespace Player
 			}
 		}
 
-		IEnumerator ScalePlayer(Vector3 newScale)
-		{
-			Vector3 initialScale = playerCollider.transform.localScale;
-
-			while (playerCollider.transform.localScale != newScale)
-			{
-				playerCollider.transform.localScale = Vector3.Lerp(initialScale, newScale, Time.fixedDeltaTime);
-				yield return new WaitForFixedUpdate();
-			}
-		}
-
 		private void SetSpeed(float multiplier)
 		{
 			currentMovementSpeed = baseMovementSpeed * multiplier;
+			Debug.Log("Current Speed: " + currentMovementSpeed);
 		}
 
 		public void OnWalk(InputAction.CallbackContext ctx)
@@ -483,13 +436,15 @@ namespace Player
 			}
 		}
 
-		float m_cameraHeight = 0.5f;
+		bool m_isCrouched = false;
+
 
 		public void OnCrouch(InputAction.CallbackContext ctx)
 		{
-			if (currentMovementState == MovementStates.normal || currentMovementState == MovementStates.walking)
+			m_isCrouched = !m_isCrouched;
+
+			if (currentMovementState == MovementStates.normal || currentMovementState == MovementStates.walking && !m_isCrouched)
 			{
-				m_cameraHeight = 0.25f;
 
 				if (currentMovementState == MovementStates.normal)
 				{
@@ -499,21 +454,16 @@ namespace Player
 				{
 					SetMovementMode(MovementStates.crouchedWalking);
 				}
-				else
-				{
-
-				}
 			}
-			else if (currentMovementState == MovementStates.crouched || currentMovementState == MovementStates.crouchedWalking)
+
+			else if (currentMovementState == MovementStates.crouched || currentMovementState == MovementStates.crouchedWalking && m_isCrouched)
 			{
-				if (crouchingBlocked)
+				if (m_standChecker.IsBlocked())
 				{
 					Debug.Log("Cannot Stand Up Here!");
 				}
-				else 
+				else
 				{
-					m_cameraHeight = 0.5f;
-
 					if (currentMovementState == MovementStates.crouched)
 					{
 						SetMovementMode(MovementStates.normal);
@@ -522,17 +472,9 @@ namespace Player
 					{
 						SetMovementMode(MovementStates.walking);
 					}
-				}
-				
+				}				
 			}
-
 		}
-
-		public float GetCameraHeight()
-		{
-			return m_cameraHeight;
-		}
-
 
 		IEnumerator JumpCooldown()
 		{

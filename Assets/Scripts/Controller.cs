@@ -13,6 +13,7 @@ namespace Player
 		[SerializeField] private HealthComponent m_healthComponent;
 		[SerializeField] private PlayerAudioManager m_audioManager;
 		[SerializeField] private Toolset m_toolset;
+		[SerializeField] private Footsteps m_footsteps;
 
 		private PlayerInput m_input;
 		private GameManager m_gameManager;
@@ -32,11 +33,10 @@ namespace Player
 			m_interact.Init(m_input, this);
 			m_toolset.Init(m_input, this);
 			m_healthComponent.Init(this);
+			m_footsteps.Init(m_input, this);
 
-			m_healthComponent.playerDead += m_movement.EnableInputEvents;
+			m_healthComponent.playerDead += m_gameManager.EnableInputEvents;
 			m_healthComponent.playerDead += m_gameManager.GetUIManager().PlayerDead;
-
-			//m_audioManager.Init(m_movement, this);
 		}
 
 		public Movement GetMovement()
@@ -72,6 +72,11 @@ namespace Player
 		public Toolset GetToolset()
 		{
 			return m_toolset;
+		}
+
+		public Footsteps GetFootsteps()
+		{
+			return m_footsteps;
 		}
 	}
 }

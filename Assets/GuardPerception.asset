@@ -21,5 +21,5 @@ MonoBehaviour:
   volumeFalloff: 1
   fovAngle: 120
   hasPeripherals: 1
-  peripheralDistance: 3
-  peripheralThreshold: 10
+  peripheralDistance: 2
+  peripheralThreshold: 0

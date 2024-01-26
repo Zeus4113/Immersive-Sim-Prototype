@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Door : MonoBehaviour, IInteractable
 {
@@ -10,6 +11,7 @@ public class Door : MonoBehaviour, IInteractable
 	private float m_rotation = 90f;
 
 	private Lock m_lock;
+	private NavMeshObstacle m_obstacle;
 
 	[SerializeField] private AudioClip m_openingSound, m_closingSound, m_lockedSound;
 	[SerializeField] private AudioSource m_source;
@@ -20,24 +22,33 @@ public class Door : MonoBehaviour, IInteractable
 	[SerializeField] private string m_interactText;
 	[SerializeField] private Sprite m_interactIcon;
 
+	private Collider m_collider;
+
 	void Awake()
 	{
 		m_hingeTransform = transform.parent;
 		m_lock = transform.GetComponent<Lock>();
+		m_obstacle = GetComponent<NavMeshObstacle>();
+		m_collider = GetComponent<Collider>();
 	}
 
 	public void Interact(Player.Interaction interaction)
 	{
 		if(m_lock != null && m_lock.GetLocked())
 		{
-			Debug.LogWarning("Locked");
+			//Debug.LogWarning("Locked");
 			m_source.PlayOneShot(m_lockedSound);
 		}
 		else if(m_lock != null && !m_lock.GetLocked())
 		{
-			Debug.LogWarning("Unlocked");
+			//Debug.LogWarning("Unlocked");
 			StartDoorMoving();
 		}
+	}
+
+	public void EnemyInteract()
+	{
+		StartDoorMoving();
 	}
 
 	public string GetInteractText()
@@ -84,6 +95,9 @@ public class Door : MonoBehaviour, IInteractable
 			{
 				if (m_isOpen)
 				{
+					m_collider.isTrigger = true;
+					m_obstacle.carving = false;
+
 					for (int i = 0; i <= (m_rotation); i++)
 					{
 						m_hingeTransform.Rotate(0, -1, 0);
@@ -96,11 +110,18 @@ public class Door : MonoBehaviour, IInteractable
 					}
 					m_interactText = "Open";
 					m_isOpen = false;
+
+					m_collider.isTrigger = false;
+					m_obstacle.carving = false;
+
 					StopDoorMoving();
 				}
 
 				else if (!m_isOpen)
 				{
+					m_collider.isTrigger = true;
+					m_obstacle.carving = false;
+
 					m_source.PlayOneShot(m_openingSound);
 
 					for (int i = 0; i <= (m_rotation); i++)
@@ -111,6 +132,10 @@ public class Door : MonoBehaviour, IInteractable
 
 					m_interactText = "Close";
 					m_isOpen = true;
+
+					m_obstacle.carving = true;
+					m_collider.isTrigger = false;
+
 					StopDoorMoving();
 				}
 			}

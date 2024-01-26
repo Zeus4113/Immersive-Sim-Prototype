@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField] private LootManager m_lootManager;
 	[SerializeField] private CheckpointManager m_checkpointManager;
 	[SerializeField] private EnemyManager m_enemyManager;
+	[SerializeField] private MissionManager m_missionManager;
 
 	private PlayerInput m_input;
 
@@ -22,13 +23,35 @@ public class GameManager : MonoBehaviour
 
 	void SetupGame()
 	{
-		m_controller.Init(m_input, this);
-		m_lootManager.Init(this);
-		m_checkpointManager.Init(this);
-		m_enemyManager.Init(this);
+		if(m_controller != null) m_controller.Init(m_input, this);
 
-		m_UIManager.Init(this);
+		if (m_lootManager != null) m_lootManager.Init(this);
+
+		if (m_checkpointManager != null) m_checkpointManager.Init(this);
+
+		if (m_enemyManager != null) m_enemyManager.Init(this);
+
+		if (m_UIManager != null) m_UIManager.Init(this);
+
+		if(m_missionManager != null ) m_missionManager.Init(this, m_enemyManager, m_lootManager);
 	}
+	public void EnableInputEvents(bool isTrue)
+	{
+		if (isTrue)
+		{
+			Cursor.lockState = CursorLockMode.Locked;
+			m_input.actions.FindActionMap("Player").Enable();
+			m_input.actions.FindActionMap("UI").Disable();
+		}
+		else if (!isTrue)
+		{
+			Cursor.lockState = CursorLockMode.Confined;
+			m_input.actions.FindActionMap("Player").Disable();
+			m_input.actions.FindActionMap("UI").Enable();
+		}
+
+	}
+
 
 	public UIManager GetUIManager()
 	{
@@ -53,5 +76,10 @@ public class GameManager : MonoBehaviour
 	public EnemyManager GetEnemyManager()
 	{
 		return m_enemyManager;
+	}
+
+	public MissionManager GetMissionManager()
+	{
+		return m_missionManager;
 	}
 }

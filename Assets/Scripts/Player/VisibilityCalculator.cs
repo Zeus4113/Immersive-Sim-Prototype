@@ -44,8 +44,6 @@ public class VisibilityCalculator : MonoBehaviour
 			velocity = m_rb.velocity.magnitude;
 			m_visibilityLevel = DetermineTotalVisibility(DetermineRaycastVisibility(), velocity);
 
-			Debug.Log(gameObject.name + " - Visibility: " + m_visibilityLevel);
-
 			if (!m_isAwake)
 			{
 				if (m_flashlightEnabled) updateHud.Invoke((m_visibilityLevel + 75) / 100);

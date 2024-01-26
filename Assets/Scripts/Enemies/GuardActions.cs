@@ -281,7 +281,7 @@ namespace Enemy
 
         public void Attack(Transform target)
         {
-            LayerMask mask = LayerMask.GetMask("Environment", "Player");
+            LayerMask mask = LayerMask.GetMask("Environment", "Player", "Interactables");
 
             RaycastHit hit;
             Physics.Raycast(transform.position, target.position - transform.position, out hit, m_attackDistance, mask);

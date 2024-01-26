@@ -56,8 +56,7 @@ public class Loot : MonoBehaviour, IInteractable
 
 	void OnDestroy()
 	{
-		m_manager.Remove(this);
-		Debug.Log("Destroyed");
+		m_manager.RemoveLoot(this);
 	}
 
 }

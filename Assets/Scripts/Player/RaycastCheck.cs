@@ -98,7 +98,6 @@ public class RaycastCheck : MonoBehaviour
 			if (hit.collider != null)
 			{
 				if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player")) { hitCount += (1 * m_sensorWeightings[i]); }
-				else Debug.Log(hit.collider.gameObject);
 
 			}
 		}

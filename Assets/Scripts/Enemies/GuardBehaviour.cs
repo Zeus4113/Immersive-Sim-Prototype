@@ -27,6 +27,7 @@ namespace Enemy
         private Perception m_perception;
         private float m_alertFloat;
         private Vector3 m_alertLocation;
+		private Rigidbody m_rb;
 
 		[SerializeField] private PerceptionDataScriptableObject m_data;
 
@@ -52,6 +53,16 @@ namespace Enemy
 
 			StartAlerted();
         }
+
+		private void OnCollisionEnter(Collision collision)
+		{
+			if (collision == null) return;
+			
+			if(collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+			{
+				UpdateAlertLevel(100, collision.transform.position);
+			}
+		}
 
 		public AlertLevel GetAlertLevel()
 		{
@@ -96,7 +107,7 @@ namespace Enemy
 
 
 						oldAlertLevel = AlertLevel.passive;
-						m_agent.speed = 2f;
+						m_agent.speed = 1f;
 						m_agent.isStopped = false;
 
 						m_actions.StartPatrolling();
@@ -107,7 +118,7 @@ namespace Enemy
 
 
 						oldAlertLevel = AlertLevel.suspicious;
-						m_agent.speed = 2.5f;
+						m_agent.speed = 2f;
 						m_agent.isStopped = false;
 
 						if (m_alertLocation != Vector3.zero)

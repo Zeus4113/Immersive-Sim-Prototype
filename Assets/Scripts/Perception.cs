@@ -93,8 +93,10 @@ namespace Enemy
 
 						if (hit.collider == c)
 						{
-							if (hit.collider.GetComponent<VisibilityCalculator>())
+							if (hit.collider.transform.GetComponent<VisibilityCalculator>())
 							{
+								//Debug.LogWarning("Player Found");
+
 								float visibility = hit.collider.GetComponent<VisibilityCalculator>().GetVisibility();
 
 								if (visibility > m_data.lookThreshold)
@@ -103,8 +105,9 @@ namespace Enemy
 									m_playerRef = hit.collider.transform;
 								}
 
-								if (m_data.hasPeripherals && Vector3.Distance(transform.position, hit.collider.transform.position) < m_data.peripheralDistance && visibility > m_data.peripheralThreshold)
+								if (m_data.hasPeripherals && Vector3.Distance(transform.position, hit.collider.transform.position) < m_data.peripheralDistance && visibility >= m_data.peripheralThreshold)
 								{
+									//Debug.LogWarning("Peripherals HIT!");
 									perceptionAlerted?.Invoke((100), hit.transform.position);
 									m_playerRef = hit.collider.transform;
 								}
@@ -150,12 +153,10 @@ namespace Enemy
 
 		IEnumerator PlayerRefDecay()
 		{
-			Debug.LogWarning("Decay Started");
 			while (c_isDecaying)
 			{
 				yield return new WaitForSeconds(m_decayTime);
 
-				Debug.LogWarning("Transform Decayed");
 				perceptionAlerted?.Invoke(0, m_playerRef.position);
 				m_playerRef = null;
 				StopDecay();

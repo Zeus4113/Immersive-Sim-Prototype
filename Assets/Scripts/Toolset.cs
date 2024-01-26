@@ -164,12 +164,12 @@ namespace Player
 			{
 				Vector2 mouseDelta = m_input.actions.FindAction("Rotation").ReadValue<Vector2>();
 
-				if(mouseDelta.magnitude > 1.25f)
+				if(mouseDelta.magnitude > 10f)
 				{
 					angle = Vector2.SignedAngle(Vector2.up, mouseDelta);
 					angle = MathTools.NormalizeAngle(angle);
 
-					Debug.LogWarning("Current Angle: " + angle);
+					//Debug.LogWarning("Current Angle: " + angle);
 
 					int toolAmount = 6;
 
