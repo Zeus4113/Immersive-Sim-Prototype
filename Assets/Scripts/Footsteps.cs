@@ -28,6 +28,7 @@ public class Footsteps : MonoBehaviour
 	[SerializeField] private GroundedChecker m_rigidbodyChecker;
 	[SerializeField] private StandChecker m_standChecker;
 	[SerializeField] private Transform m_cameraPosition;
+	[SerializeField] private CapsuleCollider m_collider;
 
 	[Header("Crouch Camera Transforms")]
 	[SerializeField] private Transform m_standTransform;
@@ -123,11 +124,13 @@ public class Footsteps : MonoBehaviour
 		{
 			m_cameraPosition.position = Vector3.Lerp(m_cameraPosition.position, m_crouchTransform.position, Time.fixedDeltaTime * 2);
 			m_playerMesh.localScale = Vector3.Lerp(m_playerMesh.localScale, new Vector3(1, 0.5f, 1), Time.fixedDeltaTime * 2);
+			m_collider.height = m_playerMesh.localScale.y * 2;
 		}
 		else if (!m_isCrouched && m_cameraPosition.position != m_standTransform.position)
 		{
 			m_cameraPosition.position = Vector3.Lerp(m_cameraPosition.position, m_standTransform.position, Time.fixedDeltaTime * 2);
 			m_playerMesh.localScale = Vector3.Lerp(m_playerMesh.localScale, new Vector3(1, 1, 1), Time.fixedDeltaTime * 2);
+			m_collider.height = m_playerMesh.localScale.y * 2;
 		}
 	}
 
