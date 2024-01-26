@@ -108,7 +108,7 @@ public class Door : MonoBehaviour, IInteractable
 							m_source.PlayOneShot(m_closingSound);
 						}
 					}
-					m_interactText = "Open";
+					m_interactText = "Open Door";
 					m_isOpen = false;
 
 					m_collider.isTrigger = false;
@@ -130,7 +130,7 @@ public class Door : MonoBehaviour, IInteractable
 						yield return new WaitForFixedUpdate();
 					}
 
-					m_interactText = "Close";
+					m_interactText = "Close Door";
 					m_isOpen = true;
 
 					m_obstacle.carving = true;

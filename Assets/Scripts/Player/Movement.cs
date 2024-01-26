@@ -107,7 +107,7 @@ namespace Player
 			m_playerInput.actions.FindAction("Jump").performed += OnJump;
 
 			m_playerInput.actions.FindAction("Crouch").performed += OnCrouch;
-			m_playerInput.actions.FindAction("Crouch").canceled += OnCrouch;
+			//m_playerInput.actions.FindAction("Crouch").canceled += OnCrouch;
 
 			m_playerInput.actions.FindAction("Walk").performed += OnWalk;
 			m_playerInput.actions.FindAction("Walk").canceled += OnWalk;

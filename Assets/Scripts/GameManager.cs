@@ -40,18 +40,17 @@ public class GameManager : MonoBehaviour
 		if (isTrue)
 		{
 			Cursor.lockState = CursorLockMode.Locked;
-			m_input.actions.FindActionMap("Player").Enable();
+			m_input.actions.FindActionMap("Player Movement").Enable();
 			m_input.actions.FindActionMap("UI").Disable();
 		}
 		else if (!isTrue)
 		{
 			Cursor.lockState = CursorLockMode.Confined;
-			m_input.actions.FindActionMap("Player").Disable();
+			m_input.actions.FindActionMap("Player Movement").Disable();
 			m_input.actions.FindActionMap("UI").Enable();
 		}
 
 	}
-
 
 	public UIManager GetUIManager()
 	{

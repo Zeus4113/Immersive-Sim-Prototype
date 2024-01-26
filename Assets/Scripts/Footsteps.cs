@@ -66,7 +66,7 @@ public class Footsteps : MonoBehaviour
 	void BindEvents()
 	{
 		m_playerInput.actions.FindAction("Crouch").performed += Crouch;
-		m_playerInput.actions.FindAction("Crouch").canceled += Crouch;
+		//m_playerInput.actions.FindAction("Crouch").canceled += Crouch;
 
 		m_playerInput.actions.FindAction("Lean").performed += StartPlayerLean;
 		m_playerInput.actions.FindAction("Lean").canceled += StopPlayerLean;
@@ -136,14 +136,31 @@ public class Footsteps : MonoBehaviour
 
 	void Crouch(InputAction.CallbackContext ctx)
 	{
-		if (m_standChecker.IsBlocked() && m_isCrouched)
+
+		if (ctx.performed)
+		{
+			if (m_isCrouched && !m_standChecker.IsBlocked())
+			{
+				m_isCrouched = false;
+			}
+			else if (!m_isCrouched)
+			{
+				m_isCrouched = true;
+			}
+		}
+		else if (ctx.canceled)
 		{
 
 		}
-		else if(!m_standChecker.IsBlocked())
-		{
-			m_isCrouched = !m_isCrouched;
-		}
+
+		//if (m_standChecker.IsBlocked() && m_isCrouched)
+		//{
+
+		//}
+		//else if(!m_standChecker.IsBlocked())
+		//{
+		//	m_isCrouched = !m_isCrouched;
+		//}
 	}
 
 	void JumpSound()
