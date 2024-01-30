@@ -16,11 +16,6 @@ public class MissionSelect : MonoBehaviour
 	{
 		ShowMissionSelect();
 		ShowMission();
-
-		foreach(GameObject go in m_missions)
-		{
-			Debug.Log(go);
-		}
 	}
 
 	void ShowMission()

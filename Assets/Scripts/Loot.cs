@@ -42,9 +42,10 @@ public class Loot : MonoBehaviour, IInteractable
 
 	IEnumerator RemoveObject()
 	{
+		this.GetComponent<AudioSource>().Play();
 		this.transform.position = m_manager.transform.position;
 
-		yield return new WaitForSeconds(0.5f);
+		yield return new WaitForSeconds(1.5f);
 
 		Destroy(this.gameObject);
 	}

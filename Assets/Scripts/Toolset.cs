@@ -66,7 +66,32 @@ namespace Player
 			m_currentTool = Tools.keychain;
 
 		}
-		
+
+		void BindEvents()
+		{
+			if (m_input == null) return;
+
+			m_input.actions.FindAction("Tool Menu").performed += StartSelecting;
+			m_input.actions.FindAction("Tool Menu").canceled += StopSelecting;
+			m_input.actions.FindAction("Use Tool").performed += UseTool;
+			m_input.actions.FindAction("Use Tool").canceled += CancelTool;
+		}
+
+		void UnbindEvents()
+		{
+			if (m_input == null) return;
+
+			m_input.actions.FindAction("Tool Menu").performed -= StartSelecting;
+			m_input.actions.FindAction("Tool Menu").canceled -= StopSelecting;
+			m_input.actions.FindAction("Use Tool").performed -= UseTool;
+			m_input.actions.FindAction("Use Tool").canceled -= CancelTool;
+		}
+
+		private void OnDestroy()
+		{
+			UnbindEvents();
+		}
+
 		public Lockpick GetLockpick()
 		{
 			return m_lockpick;

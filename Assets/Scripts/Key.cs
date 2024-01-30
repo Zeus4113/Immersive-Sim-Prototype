@@ -20,7 +20,11 @@ public class Key : MonoBehaviour, IInteractable
 	{
 		interaction.GetController().GetToolset().GetKeychain().AddKey(m_keyID);
 		gameObject.transform.position = new Vector3(0,0,0);
-		m_manager.RemoveKey(this);
+
+		if(m_manager != null)
+		{
+			m_manager.RemoveKey(this);
+		}
 	}
 
 	public string GetInteractText()

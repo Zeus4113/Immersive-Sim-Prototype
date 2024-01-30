@@ -12,9 +12,19 @@ namespace Enemy
         [SerializeField] private Transform m_patrolPathHolder;
         [SerializeField] private NavMeshAgent m_agent;
 		[SerializeField] private GameObject m_deadBody;
-        [Space(2)]
+		[SerializeField] private GroundedChecker m_groundedChecker;
+		[SerializeField] private Rigidbody m_rigidbody;
+		[SerializeField] private AudioSource m_audioSource;
+		[Space(2)]
 
-        [Header("Floats")]
+		[Header("Audio Clip Packs")]
+		[SerializeField] private AudioClip[] m_floorClips;
+		[SerializeField] private AudioClip[] m_woodClips;
+		[SerializeField] private AudioClip[] m_carpetClips;
+		[SerializeField] private AudioClip[] m_tileClips;
+		[Space(2)]
+
+		[Header("Floats")]
         [SerializeField] private float m_patrolWaitTime;
         [SerializeField] private float m_investigatingWaitTime;
         [SerializeField] private float m_attackDistance;
@@ -164,6 +174,8 @@ namespace Enemy
             while (c_isPatrolling)
             {
 				DrawGun(false);
+				FootstepSounds();
+
 				m_agent.destination = nextPosition;
 
                 if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(nextPosition.x, nextPosition.z)) < 0.25f)
@@ -191,6 +203,7 @@ namespace Enemy
             while (c_isInvestigating)
             {
 				DrawGun(false);
+				FootstepSounds();
 
 				m_agent.destination = investigationPosition;
 
@@ -213,8 +226,9 @@ namespace Enemy
             while (c_isPursuing && trackingPlayer)
             {
 				DrawGun(true);
+				FootstepSounds();
 
-                if (playerTransform == null) trackingPlayer = false;
+				if (playerTransform == null) trackingPlayer = false;
 
                 playerPosition = playerTransform.position;
                 m_agent.destination = playerPosition;
@@ -342,7 +356,89 @@ namespace Enemy
 			StopCountdown();
 		}
 
-    }
+		float m_steppingDistance = 0f;
+		float m_stepDistance = 0.65f;
+
+		void FootstepSounds()
+		{
+			Vector3 velocity = transform.InverseTransformDirection(m_agent.velocity);
+			Debug.Log(velocity);
+
+			if (velocity.magnitude > 0.1f && m_groundedChecker.IsGrounded())
+			{
+
+				m_steppingDistance += velocity.magnitude * Time.fixedDeltaTime;
+
+				//Debug.Log("Is Walking: " + m_steppingDistance);
+
+				if (m_steppingDistance >= m_stepDistance)
+				{
+					m_steppingDistance = 0;
+					m_audioSource.clip = DetermineAudioClip(m_groundedChecker.GetTag());
+					m_audioSource.volume = (velocity.magnitude * 0.05f) * DetermineVolumeModifer(m_groundedChecker.GetTag());
+					m_audioSource.Play();
+					//Debug.Log("Footstep Sound Firing");
+				}
+
+			}
+		}
+		AudioClip DetermineAudioClip(string tag)
+		{
+			tag = tag.ToLower();
+
+			switch (tag)
+			{
+				case "floor":
+
+					return m_floorClips[Random.Range(0, m_floorClips.Length)];
+
+				case "wood":
+
+					return m_woodClips[Random.Range(0, m_woodClips.Length)]; ;
+
+				case "carpet":
+
+					return m_carpetClips[Random.Range(0, m_carpetClips.Length)]; ;
+
+				case "tile":
+
+					return m_tileClips[Random.Range(0, m_tileClips.Length)]; ;
+
+				default:
+
+					return null;
+			}
+		}
+
+		float DetermineVolumeModifer(string tag)
+		{
+			tag = tag.ToLower();
+
+			switch (tag)
+			{
+				case "floor":
+
+					return 1f;
+
+				case "wood":
+
+					return 0.7f;
+
+				case "carpet":
+
+					return 0.35f;
+
+				case "tile":
+
+					return 1.5f;
+
+				default:
+
+					return 0;
+			}
+		}
+
+	}
 
 
 }

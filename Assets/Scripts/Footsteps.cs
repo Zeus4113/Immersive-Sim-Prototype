@@ -65,6 +65,8 @@ public class Footsteps : MonoBehaviour
 
 	void BindEvents()
 	{
+		if (m_playerInput == null) return;
+
 		m_playerInput.actions.FindAction("Crouch").performed += Crouch;
 		//m_playerInput.actions.FindAction("Crouch").canceled += Crouch;
 
@@ -77,6 +79,29 @@ public class Footsteps : MonoBehaviour
 		m_playerInput.actions.FindAction("Tool Menu").performed += SwitchMenuOpen;
 		m_playerInput.actions.FindAction("Tool Menu").canceled += SwitchMenuOpen;
 	}
+
+	void UnbindEvents()
+	{
+		if (m_playerInput == null) return;
+
+		m_playerInput.actions.FindAction("Crouch").performed -= Crouch;
+		//m_playerInput.actions.FindAction("Crouch").canceled += Crouch;
+
+		m_playerInput.actions.FindAction("Lean").performed -= StartPlayerLean;
+		m_playerInput.actions.FindAction("Lean").canceled -= StopPlayerLean;
+
+		m_playerInput.actions.FindAction("Rotation").performed -= StartRotation;
+		m_playerInput.actions.FindAction("Rotation").canceled -= StopRotation;
+
+		m_playerInput.actions.FindAction("Tool Menu").performed -= SwitchMenuOpen;
+		m_playerInput.actions.FindAction("Tool Menu").canceled -= SwitchMenuOpen;
+	}
+
+	private void OnDestroy()
+	{
+		UnbindEvents();
+	}
+
 
 	bool m_menuOpen = false;
 
@@ -227,7 +252,7 @@ public class Footsteps : MonoBehaviour
 				m_steppingDistance = m_stepDistance;
 				halfstepSwitcher = halfstepSwitcher * -1;
 				m_audioSource.clip = DetermineAudioClip(m_rigidbodyChecker.GetTag());
-				m_audioSource.volume = (velocity.magnitude * 0.1f) * DetermineVolumeModifer(m_rigidbodyChecker.GetTag());
+				m_audioSource.volume = (velocity.magnitude * 0.05f) * DetermineVolumeModifer(m_rigidbodyChecker.GetTag());
 				m_audioSource.Play();
 				//Debug.Log("Footstep Sound Firing");
 			}

@@ -66,7 +66,6 @@ namespace Player
 		private Camera playerCamera;
 
 		private bool crouchingBlocked;
-		private bool isGrounded;
 		private bool canJump = true;
 
 		[SerializeField] private StandChecker m_standChecker;
@@ -83,10 +82,7 @@ namespace Player
 			playerMesh = GetComponentInChildren<MeshRenderer>();
 			playerCamera = GetComponentInChildren<Camera>();
 
-			if (m_playerInput != null)
-			{
-				BindEvents();
-			}
+			BindEvents();
 
 			// Lock mouse cursor
 			Cursor.lockState = CursorLockMode.Locked;
@@ -97,6 +93,7 @@ namespace Player
 
 		void BindEvents()
 		{
+			if (m_playerInput == null) return;
 
 			m_playerInput.actions.FindAction("Movement").performed += StartMovement;
 			m_playerInput.actions.FindAction("Movement").canceled += StopMovement;
@@ -117,6 +114,36 @@ namespace Player
 
 			m_playerInput.actions.FindAction("Tool Menu").performed += ShowMenu;
 			m_playerInput.actions.FindAction("Tool Menu").canceled += RemoveMenu;
+		}
+
+		void UnbindEvents()
+		{
+			if (m_playerInput == null) return;
+
+			m_playerInput.actions.FindAction("Movement").performed -= StartMovement;
+			m_playerInput.actions.FindAction("Movement").canceled -= StopMovement;
+
+			m_playerInput.actions.FindAction("Rotation").performed -= StartRotation;
+			m_playerInput.actions.FindAction("Rotation").canceled -= StopRotation;
+
+			m_playerInput.actions.FindAction("Jump").performed -= OnJump;
+
+			m_playerInput.actions.FindAction("Crouch").performed -= OnCrouch;
+			//m_playerInput.actions.FindAction("Crouch").canceled += OnCrouch;
+
+			m_playerInput.actions.FindAction("Walk").performed -= OnWalk;
+			m_playerInput.actions.FindAction("Walk").canceled -= OnWalk;
+
+			m_playerInput.actions.FindAction("Run").performed -= OnRun;
+			m_playerInput.actions.FindAction("Run").canceled -= OnRun;
+
+			m_playerInput.actions.FindAction("Tool Menu").performed -= ShowMenu;
+			m_playerInput.actions.FindAction("Tool Menu").canceled -= RemoveMenu;
+		}
+
+		private void OnDestroy()
+		{
+			UnbindEvents();
 		}
 
 		bool c_isMoving = false;
@@ -274,11 +301,6 @@ namespace Player
 			crouchingBlocked = isTrue;
 		}
 
-		public void CheckGrounded(bool isTrue)
-		{
-			isGrounded = isTrue;
-		}
-
 		float clampedValue = 0f;
 
 		//private void RotateCamera(float inputCameraRotationValue)
@@ -429,7 +451,7 @@ namespace Player
 
 		public void OnJump(InputAction.CallbackContext ctx)
 		{
-			if (isGrounded && canJump)
+			if (m_groundChecker.IsGrounded() && canJump)
 			{
 				playerRigidbody.AddForce(0, jumpForce, 0, ForceMode.Impulse);
 				StartCoroutine(JumpCooldown());

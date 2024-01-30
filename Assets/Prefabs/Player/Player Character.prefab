@@ -1150,6 +1150,7 @@ MonoBehaviour:
   m_rigidbodyChecker: {fileID: 4936379453987460630}
   m_standChecker: {fileID: 4936379454437155331}
   m_cameraPosition: {fileID: 4936379455506497372}
+  m_collider: {fileID: 4936379455522593298}
   m_standTransform: {fileID: 4936379453835337814}
   m_crouchTransform: {fileID: 4936379453825974808}
   m_playerMesh: {fileID: 4936379454464382191}

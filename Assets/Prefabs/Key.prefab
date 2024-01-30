@@ -430,7 +430,7 @@ GameObject:
   - component: {fileID: 1134440537341479592}
   - component: {fileID: 9058075678550371749}
   - component: {fileID: 5245665921246832170}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Key
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -486,3 +486,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 419c65c8e48b53e4e979087fe82c22ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_keyID: 
+  m_interactText: 
+  m_interactSprite: {fileID: 0}
+  m_isRequired: 0

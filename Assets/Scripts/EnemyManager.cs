@@ -75,11 +75,15 @@ public class EnemyManager : MonoBehaviour
 
 	public void RegisterAlert(GameObject alertedObject)
 	{
-		if (alertedObject != null) return;
+		Debug.Log("Hit 1: " + alertedObject);
 
-		if (alertedObject.GetComponent<GuardBehaviour>()) m_guardsAlerted++;
+		if (alertedObject == null) return;
 
-		if(alertedObject.GetComponent<Alarm>()) m_alarmsTripped++;
+		Debug.Log("Hit 2");
+
+		if (alertedObject.GetComponent<GuardBehaviour>()) { m_guardsAlerted++; Debug.Log("Hit 2"); }
+
+		if(alertedObject.GetComponent<Alarm>()) { m_alarmsTripped++; Debug.Log("Hit 2"); }
 	}
 
 	public int GetAlarmsTripped()

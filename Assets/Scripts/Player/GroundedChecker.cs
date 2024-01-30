@@ -4,14 +4,7 @@ using UnityEngine;
 
 public class GroundedChecker : MonoBehaviour
 {
-	Player.Movement movementComponent;
-
 	private string m_currentFloorTag;
-
-	private void Awake()
-	{
-		movementComponent = gameObject.GetComponentInParent<Player.Movement>();
-	}
 
 	public string GetTag()
 	{
@@ -28,8 +21,6 @@ public class GroundedChecker : MonoBehaviour
 
 		if (c_checking != null) return;
 		c_checking = StartCoroutine(Checking());
-
-        movementComponent.CheckGrounded(true);
     }
 
 	void StopChecking()
@@ -40,8 +31,6 @@ public class GroundedChecker : MonoBehaviour
         if (c_checking == null) return;
         StopCoroutine(c_checking);
         c_checking = null;
-
-        movementComponent.CheckGrounded(false);
     }
 
 	IEnumerator Checking()
