@@ -135,6 +135,14 @@ public class RaycastCheck : MonoBehaviour
 			currentVisbility = currentVisbility * inverseSquareIntensity;
 		}
 
-		return currentVisbility;
+		if(light.enabled)
+		{
+			return currentVisbility;
+		}
+		else
+		{
+			return 0f;
+		}
+
 	}
 }
