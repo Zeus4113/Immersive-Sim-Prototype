@@ -19,8 +19,10 @@ public class Door : MonoBehaviour, IInteractable
 	[Space(2)]
 
 	[Header("Interactable Fields")]
-	[SerializeField] private string m_interactText;
+	[SerializeField] private string m_objectName;
 	[SerializeField] private Sprite m_interactIcon;
+
+	private string m_interactText;
 
 	private Collider m_collider;
 
@@ -30,6 +32,7 @@ public class Door : MonoBehaviour, IInteractable
 		m_lock = transform.GetComponent<Lock>();
 		m_obstacle = GetComponent<NavMeshObstacle>();
 		m_collider = GetComponent<Collider>();
+		m_interactText = "Open";
 	}
 
 	public void Interact(Player.Interaction interaction)
@@ -53,7 +56,7 @@ public class Door : MonoBehaviour, IInteractable
 
 	public string GetInteractText()
 	{
-		return m_interactText;
+		return m_interactText + " " + m_objectName;
 	}
 
 	public Sprite GetInteractSprite()
@@ -108,7 +111,7 @@ public class Door : MonoBehaviour, IInteractable
 							m_source.PlayOneShot(m_closingSound);
 						}
 					}
-					m_interactText = "Open Door";
+					m_interactText = "Open";
 					m_isOpen = false;
 
 					m_collider.isTrigger = false;
@@ -130,7 +133,7 @@ public class Door : MonoBehaviour, IInteractable
 						yield return new WaitForFixedUpdate();
 					}
 
-					m_interactText = "Close Door";
+					m_interactText = "Close";
 					m_isOpen = true;
 
 					m_obstacle.carving = true;
