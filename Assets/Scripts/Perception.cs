@@ -67,7 +67,7 @@ namespace Enemy
 
 		IEnumerator Looking()
 		{
-			LayerMask mask = LayerMask.GetMask("Player" , "DeadBodies");
+			LayerMask mask = LayerMask.GetMask("Player", "DeadBodies");
 			LayerMask rayMask = LayerMask.GetMask("Player", "DeadBodies", "Environment");
 
 
