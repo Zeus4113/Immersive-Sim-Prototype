@@ -192,7 +192,7 @@ namespace Enemy
 		IEnumerator Listening()
 		{
 			LayerMask mask = LayerMask.GetMask("Player", "Sound Effects");
-			LayerMask rayMask = LayerMask.GetMask("Player", "Sound Effects", "Environment");
+			LayerMask rayMask = LayerMask.GetMask("Player", "Sound Effects", "Environment", "Glass");
 
 
 			while (c_isListening)

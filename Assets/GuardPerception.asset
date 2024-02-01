@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canLook: 1
   canListen: 1
-  lookRange: 5
-  listenRange: 10
-  lookThreshold: 35
-  listenThreshold: 0.5
-  volumeFalloff: 1
-  fovAngle: 120
+  lookRange: 15
+  listenRange: 15
+  lookThreshold: 30
+  listenThreshold: 0.35
+  volumeFalloff: 2
+  fovAngle: 140
   hasPeripherals: 1
   peripheralDistance: 2
   peripheralThreshold: 0

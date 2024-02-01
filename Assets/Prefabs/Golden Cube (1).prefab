@@ -121,7 +121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_itemValue: 50
   m_isRequiredItem: 0
-  m_interactText: Grab
+  m_interactText: Take
   m_interactSprite: {fileID: 21300000, guid: faa4a28c0f1220c4aae2eff2b7e182a7, type: 3}
 --- !u!82 &3302045057879884045
 AudioSource:

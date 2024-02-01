@@ -30,6 +30,9 @@ namespace Enemy
         [SerializeField] private float m_attackDistance;
         [SerializeField] private float m_attackDamage;
 
+		[Header("Bools")]
+		[SerializeField] private bool m_isReturner = false;
+
 		[Header("Meshes")]
 		[SerializeField] private MeshRenderer[] m_eyeMeshes;
 
@@ -166,12 +169,14 @@ namespace Enemy
 
         // Action Coroutines
 
-        IEnumerator Patrolling(Vector3[] waypoints)
+        IEnumerator Patrolling(Transform[] waypoints)
         {
             int waypointIndex = 0;
-            Vector3 nextPosition = waypoints[waypointIndex];
+			int increment = 1;
+			Vector3 nextPosition = waypoints[waypointIndex].position;
+			Waypoint nextWaypoint = waypoints[waypointIndex].GetComponent<Waypoint>();
 
-            while (c_isPatrolling)
+			while (c_isPatrolling)
             {
 				DrawGun(false);
 				FootstepSounds();
@@ -180,9 +185,23 @@ namespace Enemy
 
                 if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(nextPosition.x, nextPosition.z)) < 0.25f)
                 {
-                    waypointIndex = (waypointIndex + 1) % waypoints.Length;
-                    nextPosition = waypoints[waypointIndex];
-                    yield return new WaitForSeconds(m_patrolWaitTime);
+					yield return new WaitForSeconds(nextWaypoint.GetWaitTime());
+
+					if (m_isReturner)
+					{
+						if (waypointIndex >= waypoints.Length -1)
+						{
+							increment = -1;
+						}
+						else if(waypointIndex <= 0)
+						{
+							increment = 1;
+						}
+					}
+
+					waypointIndex = (waypointIndex + increment) % waypoints.Length;
+                    nextPosition = waypoints[waypointIndex].position;
+					nextWaypoint = waypoints[waypointIndex].GetComponent<Waypoint>();
                 }
 
                 yield return new WaitForFixedUpdate();
@@ -256,13 +275,13 @@ namespace Enemy
 			}
 		}
 
-        Vector3[] GetWaypoints()
+		Transform[] GetWaypoints()
         {
-            Vector3[] waypoints = new Vector3[m_patrolPathHolder.childCount];
+            Transform[] waypoints = new Transform[m_patrolPathHolder.childCount];
 
             for (int i = 0; i < waypoints.Length; i++)
             {
-                waypoints[i] = m_patrolPathHolder.GetChild(i).transform.position;
+                waypoints[i] = m_patrolPathHolder.GetChild(i).transform;
             }
 
             return waypoints;
@@ -362,7 +381,7 @@ namespace Enemy
 		void FootstepSounds()
 		{
 			Vector3 velocity = transform.InverseTransformDirection(m_agent.velocity);
-			Debug.Log(velocity);
+			//Debug.Log(velocity);
 
 			if (velocity.magnitude > 0.1f && m_groundedChecker.IsGrounded())
 			{

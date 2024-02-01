@@ -107,6 +107,7 @@ public class Footsteps : MonoBehaviour
 
 	void SwitchMenuOpen(InputAction.CallbackContext ctx)
 	{
+		Debug.Log("Firing");
 		m_menuOpen = !m_menuOpen;
 	}
 

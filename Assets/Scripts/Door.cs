@@ -22,6 +22,9 @@ public class Door : MonoBehaviour, IInteractable
 	[SerializeField] private string m_objectName;
 	[SerializeField] private Sprite m_interactIcon;
 
+	[Header("Rotation")]
+	[SerializeField] char m_rotationAxis = 'y';
+
 	private string m_interactText;
 
 	private Collider m_collider;
@@ -103,7 +106,22 @@ public class Door : MonoBehaviour, IInteractable
 
 					for (int i = 0; i <= (m_rotation); i++)
 					{
-						m_hingeTransform.Rotate(0, -1, 0);
+
+						switch (m_rotationAxis)
+						{
+							case 'x':
+								m_hingeTransform.Rotate(-1, 0, 0);
+								break;
+
+							case 'y':
+								m_hingeTransform.Rotate(0, -1, 0);
+								break;
+
+							case 'z':
+								m_hingeTransform.Rotate(0, 0, -1);
+								break;
+						}
+
 						yield return new WaitForFixedUpdate();
 
 						if(i == 75)
@@ -129,7 +147,21 @@ public class Door : MonoBehaviour, IInteractable
 
 					for (int i = 0; i <= (m_rotation); i++)
 					{
-						m_hingeTransform.Rotate(0, 1, 0);
+						switch (m_rotationAxis)
+						{
+							case 'x':
+								m_hingeTransform.Rotate(1, 0, 0);
+								break;
+
+							case 'y':
+								m_hingeTransform.Rotate(0, 1, 0);
+								break;
+
+							case 'z':
+								m_hingeTransform.Rotate(0, 0, 1);
+								break;
+						}
+
 						yield return new WaitForFixedUpdate();
 					}
 
