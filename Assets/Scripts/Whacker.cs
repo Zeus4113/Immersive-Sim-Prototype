@@ -81,7 +81,7 @@ namespace Player
 			if (m_isCharged && m_target != null)
 			{
 				m_audioSource.PlayOneShot(m_hitSound , 1f);
-				m_target.GetComponentInParent<Enemy.GuardActions>().GuardUnconcious();
+				m_target.GetComponentInParent<Enemy.GuardActions>().GuardUnconcious(m_tools.GetController().gameObject);
 				m_isCharged = false;
 			}
 			else if(m_isCharged && m_target == null)

@@ -42,11 +42,20 @@ public class DoorOpener : MonoBehaviour
 			{
 				Debug.Log("Opening Doors");
 				door.EnemyInteract();
+				StartCoroutine(AutoClose(door));
 				StopOpening();
 			}
 		}
 
 		StopOpening();
+	}
+
+	IEnumerator AutoClose(Door newDoor)
+	{
+		yield return new WaitForSeconds(5.5f);
+		newDoor.EnemyInteract();
+		Debug.Log("Auto Closing");
+
 	}
 
 	private void OnTriggerEnter(Collider other)

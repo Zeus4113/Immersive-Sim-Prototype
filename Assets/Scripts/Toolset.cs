@@ -149,6 +149,11 @@ namespace Player
 			}
 		}
 
+		public bool IsMenuOpen()
+		{
+			return c_isSelecting;
+		}
+
 		// Tool menu selection
 
 		bool c_isSelecting = false;

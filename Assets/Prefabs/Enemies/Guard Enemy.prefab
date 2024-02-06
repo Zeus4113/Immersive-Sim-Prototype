@@ -949,7 +949,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3825916015582688256}
   - component: {fileID: 5073720367069614156}
-  m_Layer: 0
+  - component: {fileID: 1832829044136533508}
+  m_Layer: 9
   m_Name: Audio Source
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1067,6 +1068,27 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!135 &1832829044136533508
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5061804362071064404}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5814211598563189834
 GameObject:
   m_ObjectHideFlags: 0
@@ -1734,6 +1756,8 @@ MonoBehaviour:
   m_investigatingWaitTime: 2
   m_attackDistance: 3
   m_attackDamage: 10
+  m_reactionTime: 0.5
+  m_isReturner: 0
   m_eyeMeshes:
   - {fileID: 6292807493119652280}
   - {fileID: 2642487329655227049}
@@ -1760,6 +1784,9 @@ MonoBehaviour:
   m_alertFalloffModifier: 3
   m_attackRange: 3
   m_attackCooldown: 0.5
+  m_suspiciousClip: {fileID: 8300000, guid: 95bc66b36df08414c879c2e7489b1eee, type: 3}
+  m_passiveClip: {fileID: 8300000, guid: d76f1cebf47381649947df1001033328, type: 3}
+  m_alertedClip: {fileID: 8300000, guid: 81a1c5b936c9e2e46a5acdf91204b207, type: 3}
   m_data: {fileID: 11400000, guid: ba9ee4a813fbbbd4eb6c0485f698c641, type: 2}
 --- !u!114 &8216457774928416280
 MonoBehaviour:
@@ -1774,7 +1801,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_visibilityModifier: 1
-  m_volumeModifier: 15
+  m_volumeModifier: 200
   m_eyeSocket: {fileID: 0}
 --- !u!82 &734153510477450610
 AudioSource:
@@ -1868,7 +1895,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -7241,6 +7268,6 @@ MeshCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}

@@ -1032,7 +1032,7 @@ MonoBehaviour:
   walkSpeedModifier: 0.5
   crouchWalkSpeedModifer: 0.25
   crouchSpeedModifer: 0.75
-  mouseSensitivityPlayer: 7
+  mouseSensitivityPlayer: 10
   jumpForce: 300
   m_jumpCooldown: 1
   mouseSensitivityCamera: 0.15
@@ -1147,6 +1147,9 @@ MonoBehaviour:
   m_zAxisHeadbobModifier: 0
   m_yAxisHeadbobModifier: 0.35
   m_lerpSpeed: 2
+  m_mouseSensitivityCamera: 0.05
+  m_minCameraRotation: -80
+  m_maxCameraRotation: 60
   m_rigidbodyChecker: {fileID: 4936379453987460630}
   m_standChecker: {fileID: 4936379454437155331}
   m_cameraPosition: {fileID: 4936379455506497372}
@@ -1581,8 +1584,8 @@ Light:
   m_Type: 0
   m_Shape: 0
   m_Color: {r: 1, g: 0.9627509, b: 0.8820755, a: 1}
-  m_Intensity: 0.75
-  m_Range: 10
+  m_Intensity: 1.25
+  m_Range: 35
   m_SpotAngle: 45
   m_InnerSpotAngle: 4
   m_CookieSize: 10

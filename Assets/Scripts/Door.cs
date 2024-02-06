@@ -23,7 +23,8 @@ public class Door : MonoBehaviour, IInteractable
 	[SerializeField] private Sprite m_interactIcon;
 
 	[Header("Rotation")]
-	[SerializeField] char m_rotationAxis = 'y';
+	[SerializeField] private char m_rotationAxis = 'y';
+	[SerializeField] private bool m_isReversed = false;
 
 	private string m_interactText;
 
@@ -54,6 +55,11 @@ public class Door : MonoBehaviour, IInteractable
 
 	public void EnemyInteract()
 	{
+		if (m_lock != null && m_lock.GetLocked())
+		{
+			m_lock.SetLocked(false);
+		}
+
 		StartDoorMoving();
 	}
 
@@ -110,15 +116,42 @@ public class Door : MonoBehaviour, IInteractable
 						switch (m_rotationAxis)
 						{
 							case 'x':
-								m_hingeTransform.Rotate(-1, 0, 0);
+
+								if (m_isReversed) 
+								{
+									m_hingeTransform.Rotate(-1, 0, 0);
+								}
+								else
+								{
+									m_hingeTransform.Rotate(1, 0, 0);
+								}
+
 								break;
 
 							case 'y':
-								m_hingeTransform.Rotate(0, -1, 0);
+
+								if (m_isReversed)
+								{
+									m_hingeTransform.Rotate(0, -1, 0);
+								}
+								else
+								{
+									m_hingeTransform.Rotate(0, 1, 0);
+								}
+
 								break;
 
 							case 'z':
-								m_hingeTransform.Rotate(0, 0, -1);
+
+								if (m_isReversed)
+								{
+									m_hingeTransform.Rotate(0, 0, -1);
+								}
+								else
+								{
+									m_hingeTransform.Rotate(0, 0, 1);
+								}
+
 								break;
 						}
 
@@ -150,15 +183,42 @@ public class Door : MonoBehaviour, IInteractable
 						switch (m_rotationAxis)
 						{
 							case 'x':
-								m_hingeTransform.Rotate(1, 0, 0);
+
+								if (m_isReversed)
+								{
+									m_hingeTransform.Rotate(1, 0, 0);
+								}
+								else if(!m_isReversed)
+								{
+									m_hingeTransform.Rotate(-1, 0, 0);
+								}
+
 								break;
 
 							case 'y':
-								m_hingeTransform.Rotate(0, 1, 0);
+
+								if (m_isReversed)
+								{
+									m_hingeTransform.Rotate(0, 1, 0);
+								}
+								else if (!m_isReversed)
+								{
+									m_hingeTransform.Rotate(0, -1, 0);
+								}
+
 								break;
 
 							case 'z':
-								m_hingeTransform.Rotate(0, 0, 1);
+
+								if (m_isReversed)
+								{
+									m_hingeTransform.Rotate(0, 0, 1);
+								}
+								else if (!m_isReversed)
+								{
+									m_hingeTransform.Rotate(0, 0, -1);
+								}
+
 								break;
 						}
 

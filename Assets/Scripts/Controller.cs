@@ -24,6 +24,7 @@ namespace Player
 			m_gameManager = gm;
 
 			SetupPlayer();
+			BindEvents();
 		}
 
 		public void SetupPlayer()
@@ -37,6 +38,24 @@ namespace Player
 
 			m_healthComponent.playerDead += m_gameManager.EnableInputEvents;
 			m_healthComponent.playerDead += m_gameManager.GetUIManager().PlayerDead;
+
+		}
+
+		private void OnDestroy()
+		{
+			UnbindEvents();
+		}
+
+		void BindEvents()
+		{
+			if (m_input == null) return;
+			m_input.actions.FindAction("Pause Menu").performed += m_gameManager.GetUIManager().GamePaused;
+		}
+
+		void UnbindEvents()
+		{
+			if (m_input == null) return;
+			m_input.actions.FindAction("Pause Menu").performed -= m_gameManager.GetUIManager().GamePaused;
 		}
 
 		public Movement GetMovement()

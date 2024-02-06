@@ -16,6 +16,7 @@ public class PerceptionDataScriptableObject : ScriptableObject
 
 	public float volumeFalloff = 2f;
 	public float fovAngle = 45f;
+	public bool distanceFalloff = false;
 
 	public bool hasPeripherals = false;
 	public float peripheralDistance = 10f;

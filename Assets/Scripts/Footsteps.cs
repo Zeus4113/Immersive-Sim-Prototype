@@ -24,6 +24,12 @@ public class Footsteps : MonoBehaviour
 	[SerializeField] private float m_lerpSpeed = 1f;
 	[Space(2)]
 
+	[SerializeField] private float m_mouseSensitivityCamera = 0.2f;
+	[SerializeField] private float m_minCameraRotation = -80f;
+	[SerializeField] private float m_maxCameraRotation = 60f;
+	[Space(2)]
+
+
 	[Header("References")]
 	[SerializeField] private GroundedChecker m_rigidbodyChecker;
 	[SerializeField] private StandChecker m_standChecker;
@@ -34,6 +40,8 @@ public class Footsteps : MonoBehaviour
 	[SerializeField] private Transform m_standTransform;
 	[SerializeField] private Transform m_crouchTransform;
 	[SerializeField] private Transform m_playerMesh;
+
+
 
 	Player.Movement m_movement;
 
@@ -67,34 +75,30 @@ public class Footsteps : MonoBehaviour
 	{
 		if (m_playerInput == null) return;
 
+		Debug.LogWarning("Footsteps Bound");
+
 		m_playerInput.actions.FindAction("Crouch").performed += Crouch;
-		//m_playerInput.actions.FindAction("Crouch").canceled += Crouch;
 
 		m_playerInput.actions.FindAction("Lean").performed += StartPlayerLean;
 		m_playerInput.actions.FindAction("Lean").canceled += StopPlayerLean;
 
 		m_playerInput.actions.FindAction("Rotation").performed += StartRotation;
 		m_playerInput.actions.FindAction("Rotation").canceled += StopRotation;
-
-		m_playerInput.actions.FindAction("Tool Menu").performed += SwitchMenuOpen;
-		m_playerInput.actions.FindAction("Tool Menu").canceled += SwitchMenuOpen;
 	}
 
 	void UnbindEvents()
 	{
 		if (m_playerInput == null) return;
 
+		Debug.LogWarning("Footsteps Unbound");
+
 		m_playerInput.actions.FindAction("Crouch").performed -= Crouch;
-		//m_playerInput.actions.FindAction("Crouch").canceled += Crouch;
 
 		m_playerInput.actions.FindAction("Lean").performed -= StartPlayerLean;
 		m_playerInput.actions.FindAction("Lean").canceled -= StopPlayerLean;
 
 		m_playerInput.actions.FindAction("Rotation").performed -= StartRotation;
 		m_playerInput.actions.FindAction("Rotation").canceled -= StopRotation;
-
-		m_playerInput.actions.FindAction("Tool Menu").performed -= SwitchMenuOpen;
-		m_playerInput.actions.FindAction("Tool Menu").canceled -= SwitchMenuOpen;
 	}
 
 	private void OnDestroy()
@@ -102,14 +106,13 @@ public class Footsteps : MonoBehaviour
 		UnbindEvents();
 	}
 
-
 	bool m_menuOpen = false;
 
-	void SwitchMenuOpen(InputAction.CallbackContext ctx)
-	{
-		Debug.Log("Firing");
-		m_menuOpen = !m_menuOpen;
-	}
+	//void SwitchMenuOpen(InputAction.CallbackContext ctx)
+	//{
+	//	Debug.Log("Firing");
+	//	m_menuOpen = !m_menuOpen;
+	//}
 
 	bool c_isUpdating = false;
 	Coroutine c_updating;
@@ -203,7 +206,7 @@ public class Footsteps : MonoBehaviour
 			m_steppingDistance = 0f;
 			m_isFalling = false;
 			m_audioSource.clip = DetermineAudioClip(m_rigidbodyChecker.GetTag());
-			m_audioSource.volume = 1f * DetermineVolumeModifer(m_rigidbodyChecker.GetTag());
+			m_audioSource.volume = 0.5f * DetermineVolumeModifer(m_rigidbodyChecker.GetTag());
 			m_audioSource.Play();
 			//Debug.Log("Jump Sound");
 		}
@@ -281,7 +284,7 @@ public class Footsteps : MonoBehaviour
 	public void StartPlayerLean(InputAction.CallbackContext ctx)
 	{
 		direction = ctx.ReadValue<float>();
-		m_leanAmount = 0.65f * -direction;
+		m_leanAmount = 1 * -direction;
 		RotateCamera(0f);
 	}
 
@@ -297,14 +300,10 @@ public class Footsteps : MonoBehaviour
 		return m_leanAmount;
 	}
 
-	float mouseSensitivityCamera = 0.2f;
-	float minCameraRotation = -80f;
-	float maxCameraRotation = 60f;
-
 	private void RotateCamera(float inputCameraRotationValue)
 	{
 		Vector3 currentRotationalValue = m_cameraPosition.transform.rotation.eulerAngles;
-		float clampedValue = MathTools.ClampAngle(currentRotationalValue.x - (inputCameraRotationValue * mouseSensitivityCamera), minCameraRotation, maxCameraRotation);
+		float clampedValue = MathTools.ClampAngle(currentRotationalValue.x - (inputCameraRotationValue * m_mouseSensitivityCamera), m_minCameraRotation, m_maxCameraRotation);
 		m_cameraPosition.transform.localRotation = Quaternion.Euler(clampedValue, 0, (0f - (GetLeanAmount())));
 	}
 
@@ -337,9 +336,11 @@ public class Footsteps : MonoBehaviour
 
 	IEnumerator Rotating(InputAction.CallbackContext ctx)
 	{
-		if (c_isRotating)
+		Player.Toolset tools = m_controller.GetToolset();
+
+		while (c_isRotating)
 		{
-			if (!m_menuOpen && Time.timeScale != 0)
+			if(!tools.IsMenuOpen() && Time.timeScale != 0)
 			{
 				float cameraRotationValue = ctx.ReadValue<Vector2>().y;
 				RotateCamera(cameraRotationValue);

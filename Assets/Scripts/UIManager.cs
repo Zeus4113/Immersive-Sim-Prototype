@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 
 public class UIManager : MonoBehaviour
@@ -16,6 +17,7 @@ public class UIManager : MonoBehaviour
 	private ToolMenu m_toolMenu;
 	private DeathScreen m_deathScreen;
 	private MissionSummary m_missionSummary;
+	private PauseMenu m_pauseMenu;
 
 	public void Init(GameManager gm)
 	{
@@ -29,6 +31,7 @@ public class UIManager : MonoBehaviour
 		m_toolMenu = transform.Find("Tool Menu").GetComponent<ToolMenu>();
 		m_deathScreen = transform.Find("Death Screen").GetComponent<DeathScreen>();
 		m_missionSummary = transform.Find("Mission End Screen").GetComponent<MissionSummary>();
+		m_pauseMenu = transform.Find("Pause Menu").GetComponent<PauseMenu>();
 
 		SetupHUD();
 
@@ -40,6 +43,7 @@ public class UIManager : MonoBehaviour
 		m_missionScore.SetText(0);
 		m_interactIcon.ToggleInteract(false);
 		m_hintPopup.DisplayHint(null);
+		m_pauseMenu.Init(this);
 
 
 		//m_gameManager.GetController().GetInteract().IsPresent += m_interactIcon.ToggleInteract;
@@ -69,6 +73,23 @@ public class UIManager : MonoBehaviour
 	public void MissionComplete()
 	{
 		m_missionSummary.gameObject.SetActive(true);
+	}
+
+	public void GamePaused(InputAction.CallbackContext ctx)
+	{
+		m_pauseMenu.gameObject.SetActive(true);
+		m_gameManager.EnableInputEvents(false);
+	}
+
+	public void GameUnpaused()
+	{
+		m_pauseMenu.gameObject.SetActive(false);
+		m_gameManager.EnableInputEvents(true);
+	}
+
+	public PauseMenu GetPauseMenu()
+	{
+		return m_pauseMenu;
 	}
 
 	public DeathScreen GetDeathScreen()

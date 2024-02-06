@@ -7,7 +7,7 @@ namespace Enemy
 	public class Perception : MonoBehaviour
 	{
 		[SerializeField] private float m_visibilityModifier = 0.1f;
-		[SerializeField] private float m_volumeModifier = 15f;
+		[SerializeField] private float m_volumeModifier = 30f;
 		[SerializeField] private Transform m_eyeSocket;
 
 		public event Disturbance perceptionAlerted;
@@ -68,7 +68,7 @@ namespace Enemy
 		IEnumerator Looking()
 		{
 			LayerMask mask = LayerMask.GetMask("Player", "DeadBodies");
-			LayerMask rayMask = LayerMask.GetMask("Player", "DeadBodies", "Environment");
+			LayerMask rayMask = LayerMask.GetMask("Player", "DeadBodies", "Environment", "Interactables");
 
 
 			while (c_isLooking)
@@ -204,6 +204,7 @@ namespace Enemy
 				{
 					AudioSource source = c.GetComponent<AudioSource>();
 
+
 					if(source != null)
 					{
 						if (source.isPlaying && source.clip != null)
@@ -219,14 +220,19 @@ namespace Enemy
 
 							if (audioManager != null) volume *= audioManager.GetModifier();
 
-							Debug.Log(volume);
-							Debug.Log(m_data.listenThreshold);
+							if (m_data.distanceFalloff)
+							{
+								volume = volume / Vector3.Distance(c.transform.position, transform.position);
+							}
 
 							if (volume > m_data.listenThreshold)
 							{
 								perceptionAlerted?.Invoke(volume * m_volumeModifier, c.transform.position); 
 								perceptionTick?.Invoke(volume * m_volumeModifier, c.transform.position);
 							}
+
+							//Debug.Log(volume);
+
 						}
 					}
 				}

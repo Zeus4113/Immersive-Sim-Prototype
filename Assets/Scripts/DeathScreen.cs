@@ -12,6 +12,7 @@ public class DeathScreen : MonoBehaviour
 
 	public void RestartLevel()
 	{
+		SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene().name);
 		SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
 	}
 

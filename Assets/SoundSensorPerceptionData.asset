@@ -17,9 +17,10 @@ MonoBehaviour:
   lookRange: 0
   listenRange: 10
   lookThreshold: 0
-  listenThreshold: 0.2
+  listenThreshold: 0.35
   volumeFalloff: 5
   fovAngle: 45
+  distanceFalloff: 0
   hasPeripherals: 0
   peripheralDistance: 10
   peripheralThreshold: 10

@@ -57,7 +57,6 @@ namespace Player
 
 		// Rotation
 		private float playerRotationValue;
-		private float cameraRotationValue;
 
 		// Components
 		private Collider playerCollider;
@@ -271,7 +270,6 @@ namespace Player
 			if (c_isRotating && !m_isMenuShown)
 			{
 				playerRotationValue = ctx.ReadValue<Vector2>().x;
-				cameraRotationValue = ctx.ReadValue<Vector2>().y;
 
 				Quaternion rotation = Quaternion.Euler(new Vector3(0, playerRotationValue * mouseSensitivityPlayer, 0) * Time.fixedDeltaTime);
 				playerRigidbody.MoveRotation(playerRigidbody.rotation * rotation);

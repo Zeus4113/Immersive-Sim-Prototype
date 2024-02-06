@@ -20,20 +20,22 @@ namespace Enemy
 		[SerializeField] private float m_attackRange = 5f;
 		[SerializeField] private float m_attackCooldown = 5f;
 
+		[Header("Audio")]
+		[SerializeField] private AudioClip m_suspiciousClip, m_passiveClip, m_alertedClip;
+
 		private EnemyManager m_enemyManager;
 		private NavMeshAgent m_agent;
-
         private GuardActions m_actions;
         private Perception m_perception;
         private float m_alertFloat;
         private Vector3 m_alertLocation;
 		private Rigidbody m_rb;
+		private AudioSource m_audioSource;
 
 		[SerializeField] private PerceptionDataScriptableObject m_data;
 
         public void Init(EnemyManager em)
         {
-			Debug.LogWarning(gameObject.name + " Initialised");
 
 			m_enemyManager = em;
 			m_alertLocation = Vector3.zero;
@@ -43,6 +45,7 @@ namespace Enemy
             m_agent = GetComponent<NavMeshAgent>();
             m_actions = GetComponent<GuardActions>();
             m_perception = GetComponent<Perception>();
+			m_audioSource = GetComponent<AudioSource>();
 
 			m_perception.Init(m_data);
 			m_perception.StartLooking();
@@ -103,20 +106,31 @@ namespace Enemy
 
 				switch (DetemineAlertLevel())
 				{
+
 					case AlertLevel.passive:
 
+						if (oldAlertLevel != AlertLevel.passive)
+						{
+							m_audioSource.PlayOneShot(m_passiveClip, 1f);
+						}
 
 						oldAlertLevel = AlertLevel.passive;
 						m_agent.speed = 1f;
 						m_agent.isStopped = false;
-
 						m_actions.StartPatrolling();
 
 						break;
 
 					case AlertLevel.suspicious:
 
+						if (oldAlertLevel != AlertLevel.suspicious) 
+						{
+							m_audioSource.PlayOneShot(m_suspiciousClip, 0.5f);
+							Debug.Log("Clip Played");
+						}
 
+
+						Debug.Log("Suspicious");
 						oldAlertLevel = AlertLevel.suspicious;
 						m_agent.speed = 2f;
 						m_agent.isStopped = false;
@@ -136,7 +150,11 @@ namespace Enemy
 
 					case AlertLevel.alerted:
 
-						if (oldAlertLevel != AlertLevel.alerted) alertTriggered?.Invoke(this.gameObject);
+						if (oldAlertLevel != AlertLevel.alerted)
+						{
+							alertTriggered?.Invoke(this.gameObject);
+							m_audioSource.PlayOneShot(m_alertedClip, 0.75f);
+						}
 
 						oldAlertLevel = AlertLevel.alerted;
 						m_agent.speed = 3f;
@@ -183,6 +201,7 @@ namespace Enemy
                     attackCooldown -= Time.fixedDeltaTime;
                 }
 
+
 				yield return new WaitForFixedUpdate();
 			}
 
@@ -192,7 +211,9 @@ namespace Enemy
 
         private AlertLevel DetemineAlertLevel()
         {
-            //Debug.Log(gameObject.name + " Alert Level: " + Mathf.Round(m_alertFloat));
+
+			m_alertFloat = Mathf.Clamp(m_alertFloat, 0, 100);
+
             switch (m_alertFloat)
             {
                 default:
@@ -209,12 +230,10 @@ namespace Enemy
             }
         }
 
-        private void UpdateAlertLevel(float amount, Vector3 position)
+        public void UpdateAlertLevel(float amount, Vector3 position)
         {
 			if(amount > m_alertFloat) m_alertFloat = amount;
             m_alertLocation = position;
-
-			//Debug.Log("Alert Level: " + m_alertFloat);
         }
 
 		private void TickAlertLevel(float amount, Vector3 position)

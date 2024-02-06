@@ -29,6 +29,7 @@ namespace Enemy
         [SerializeField] private float m_investigatingWaitTime;
         [SerializeField] private float m_attackDistance;
         [SerializeField] private float m_attackDamage;
+		[SerializeField] private float m_reactionTime;
 
 		[Header("Bools")]
 		[SerializeField] private bool m_isReturner = false;
@@ -88,10 +89,18 @@ namespace Enemy
             if (c_pursuing != null) StopPursuing();
         }
 
+		private void OnCollisionEnter(Collision collision)
+		{
+			if(collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+			{
+				this.GetComponent<GuardBehaviour>().UpdateAlertLevel(100, collision.transform.position);
+			}
+		}
 
-        // Start & Stop Patrolling
 
-        public void StartPatrolling()
+		// Start & Stop Patrolling
+
+		public void StartPatrolling()
         {
             if (c_isPatrolling) return;
             c_isPatrolling = true;
@@ -101,8 +110,9 @@ namespace Enemy
             StopActionCoroutines();
             c_patrolling = StartCoroutine(Patrolling(GetWaypoints()));
 			SetMeshColour("green");
+			//m_audioSource.PlayOneShot(m_passiveClip);
 
-			Debug.Log("Action - Patrolling");
+			Debug.LogWarning("Action - Patrolling");
         }
 
         public void StopPatrolling()
@@ -127,8 +137,9 @@ namespace Enemy
             StopActionCoroutines();
             c_investigating = StartCoroutine(Investigating(target));
 			SetMeshColour("Yellow");
+			//m_audioSource.PlayOneShot(m_suspiciousClip);
 
-			Debug.Log("Action - Investigating");
+			Debug.LogWarning("Action - Investigating");
         }
 
         public void StopInvestigating()
@@ -153,8 +164,9 @@ namespace Enemy
             StopActionCoroutines();
             c_pursuing = StartCoroutine(Pursuing(player));
 			SetMeshColour("red");
+			//m_audioSource.PlayOneShot(m_alertedClip);
 
-			Debug.Log("Action - Pursuing");
+			Debug.LogWarning("Action - Pursuing");
         }
 
         public void StopPursuing()
@@ -175,6 +187,8 @@ namespace Enemy
 			int increment = 1;
 			Vector3 nextPosition = waypoints[waypointIndex].position;
 			Waypoint nextWaypoint = waypoints[waypointIndex].GetComponent<Waypoint>();
+
+			m_isVunerable = true;
 
 			while (c_isPatrolling)
             {
@@ -219,7 +233,10 @@ namespace Enemy
 
             int pointsInAreaIndex = 0;
 
-            while (c_isInvestigating)
+			yield return new WaitForSeconds(m_reactionTime);
+			m_isVunerable = false;
+
+			while (c_isInvestigating)
             {
 				DrawGun(false);
 				FootstepSounds();
@@ -240,76 +257,24 @@ namespace Enemy
         IEnumerator Pursuing(Transform playerTransform)
         {
             bool trackingPlayer = true;
-            Vector3 playerPosition = playerTransform.position;
 
-            while (c_isPursuing && trackingPlayer)
+			yield return new WaitForSeconds(m_reactionTime);
+			m_isVunerable = false;
+
+			while (c_isPursuing && trackingPlayer)
             {
 				DrawGun(true);
 				FootstepSounds();
 
 				if (playerTransform == null) trackingPlayer = false;
 
-                playerPosition = playerTransform.position;
+				Vector3 playerPosition = playerTransform.position;
                 m_agent.destination = playerPosition;
-
-                if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(playerPosition.x, playerPosition.z)) < 0.25f)
-                {
-                    // Attack
-                }
 
                 yield return new WaitForFixedUpdate();
             }
-        }
 
-		void DrawGun(bool isDrawn)
-		{
-			if (isDrawn && m_gunTransform != m_heldTransform)
-			{
-				m_gunTransform.position = Vector3.Lerp(m_gunTransform.position, m_heldTransform.position, Time.fixedDeltaTime * 3);
-				m_gunTransform.rotation = Quaternion.Lerp(m_gunTransform.rotation, m_heldTransform.rotation, Time.fixedDeltaTime * 3);
-			}
-			else if (!isDrawn && m_gunTransform != m_holsterTransform)
-			{
-				m_gunTransform.position = Vector3.Lerp(m_gunTransform.position, m_holsterTransform.position, Time.fixedDeltaTime * 3);
-				m_gunTransform.rotation = Quaternion.Lerp(m_gunTransform.rotation, m_holsterTransform.rotation, Time.fixedDeltaTime * 3);
-			}
-		}
-
-		Transform[] GetWaypoints()
-        {
-            Transform[] waypoints = new Transform[m_patrolPathHolder.childCount];
-
-            for (int i = 0; i < waypoints.Length; i++)
-            {
-                waypoints[i] = m_patrolPathHolder.GetChild(i).transform;
-            }
-
-            return waypoints;
-        }
-
-        Vector3[] GetRandomPointsInArea(Vector3 centre, int amount, float radius)
-        {
-            Vector3[] randomPoints = new Vector3[amount];
-
-            for (int i = 0; i < amount; i++)
-            {
-                NavMeshPath path = new NavMeshPath();
-
-                randomPoints[i] = centre + new Vector3(Random.insideUnitCircle.x * radius, centre.y, Random.insideUnitCircle.y * radius);
-                m_agent.CalculatePath(randomPoints[i], path);
-
-                Debug.Log(randomPoints[i]);
-
-				int counter = 0;
-				
-                while (path.status != NavMeshPathStatus.PathComplete && counter < 100)
-                {
-					counter++;
-					randomPoints[i] = centre + new Vector3(Random.insideUnitCircle.x * radius, centre.y, Random.insideUnitCircle.y * radius);
-                    m_agent.CalculatePath(randomPoints[i], path);
-                }
-            }
-            return randomPoints;
+			StopPursuing();
         }
 
         public void Attack(Transform target)
@@ -336,13 +301,70 @@ namespace Enemy
 			return m_investigationPosition;
 		}
 
-		public void GuardUnconcious()
+		bool m_isVunerable = false;
+
+		public void GuardUnconcious(GameObject player)
 		{
-			if(this.GetComponent<GuardBehaviour>().GetAlertLevel() != AlertLevel.alerted)
+			if(m_isVunerable)
 			{
 				Instantiate(m_deadBody, transform.position, transform.rotation);
 				Destroy(gameObject);
 			}
+			else if(player != null && !m_isVunerable)
+			{
+				this.GetComponent<GuardBehaviour>().UpdateAlertLevel(100, player.transform.position);
+			}
+		}
+
+		void DrawGun(bool isDrawn)
+		{
+			if (isDrawn && m_gunTransform != m_heldTransform)
+			{
+				m_gunTransform.position = Vector3.Lerp(m_gunTransform.position, m_heldTransform.position, Time.fixedDeltaTime * 3);
+				m_gunTransform.rotation = Quaternion.Lerp(m_gunTransform.rotation, m_heldTransform.rotation, Time.fixedDeltaTime * 3);
+			}
+			else if (!isDrawn && m_gunTransform != m_holsterTransform)
+			{
+				m_gunTransform.position = Vector3.Lerp(m_gunTransform.position, m_holsterTransform.position, Time.fixedDeltaTime * 3);
+				m_gunTransform.rotation = Quaternion.Lerp(m_gunTransform.rotation, m_holsterTransform.rotation, Time.fixedDeltaTime * 3);
+			}
+		}
+
+		Transform[] GetWaypoints()
+		{
+			Transform[] waypoints = new Transform[m_patrolPathHolder.childCount];
+
+			for (int i = 0; i < waypoints.Length; i++)
+			{
+				waypoints[i] = m_patrolPathHolder.GetChild(i).transform;
+			}
+
+			return waypoints;
+		}
+
+		Vector3[] GetRandomPointsInArea(Vector3 centre, int amount, float radius)
+		{
+			Vector3[] randomPoints = new Vector3[amount];
+
+			for (int i = 0; i < amount; i++)
+			{
+				NavMeshPath path = new NavMeshPath();
+
+				randomPoints[i] = centre + new Vector3(Random.insideUnitCircle.x * radius, centre.y, Random.insideUnitCircle.y * radius);
+				m_agent.CalculatePath(randomPoints[i], path);
+
+				Debug.Log(randomPoints[i]);
+
+				int counter = 0;
+
+				while (path.status != NavMeshPathStatus.PathComplete && counter < 100)
+				{
+					counter++;
+					randomPoints[i] = centre + new Vector3(Random.insideUnitCircle.x * radius, centre.y, Random.insideUnitCircle.y * radius);
+					m_agent.CalculatePath(randomPoints[i], path);
+				}
+			}
+			return randomPoints;
 		}
 
 		bool c_isCounting = false;
@@ -371,7 +393,7 @@ namespace Enemy
 		{
 			yield return new WaitForSeconds(5f);
 
-			GuardUnconcious();
+			GuardUnconcious(null);
 			StopCountdown();
 		}
 
@@ -394,13 +416,14 @@ namespace Enemy
 				{
 					m_steppingDistance = 0;
 					m_audioSource.clip = DetermineAudioClip(m_groundedChecker.GetTag());
-					m_audioSource.volume = (velocity.magnitude * 0.05f) * DetermineVolumeModifer(m_groundedChecker.GetTag());
+					m_audioSource.volume = (velocity.magnitude * 0.5f) * DetermineVolumeModifer(m_groundedChecker.GetTag());
 					m_audioSource.Play();
 					//Debug.Log("Footstep Sound Firing");
 				}
 
 			}
 		}
+
 		AudioClip DetermineAudioClip(string tag)
 		{
 			tag = tag.ToLower();
