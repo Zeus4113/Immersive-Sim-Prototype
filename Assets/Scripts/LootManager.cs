@@ -52,11 +52,6 @@ public class LootManager : MonoBehaviour
 		Debug.Log("Total Score: " + m_totalScore);
 	}
 
-	public void AddLoot(Loot newItem)
-	{
-		m_lootList.Add(newItem);
-	}
-
 	public void RemoveLoot(Loot newItem)
 	{
 		m_currentScore += newItem.GetValue();

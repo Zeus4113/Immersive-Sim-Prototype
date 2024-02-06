@@ -16,7 +16,7 @@ MonoBehaviour:
   canListen: 1
   lookRange: 10
   listenRange: 15
-  lookThreshold: 30
+  lookThreshold: 35
   listenThreshold: 0.025
   volumeFalloff: 3
   fovAngle: 140

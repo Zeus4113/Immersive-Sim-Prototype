@@ -112,7 +112,6 @@ namespace Enemy
 			SetMeshColour("green");
 			//m_audioSource.PlayOneShot(m_passiveClip);
 
-			Debug.LogWarning("Action - Patrolling");
         }
 
         public void StopPatrolling()
@@ -139,7 +138,6 @@ namespace Enemy
 			SetMeshColour("Yellow");
 			//m_audioSource.PlayOneShot(m_suspiciousClip);
 
-			Debug.LogWarning("Action - Investigating");
         }
 
         public void StopInvestigating()
@@ -166,7 +164,6 @@ namespace Enemy
 			SetMeshColour("red");
 			//m_audioSource.PlayOneShot(m_alertedClip);
 
-			Debug.LogWarning("Action - Pursuing");
         }
 
         public void StopPursuing()
