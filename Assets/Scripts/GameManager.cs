@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
 
 	void SetupGame()
 	{
-		if(m_controller != null) m_controller.Init(m_input, this);
+		//if(m_controller != null) m_controller.Init(m_input, this);
 
 		if (m_lootManager != null) m_lootManager.Init(this);
 
@@ -33,7 +33,9 @@ public class GameManager : MonoBehaviour
 
 		if (m_UIManager != null) m_UIManager.Init(this);
 
-		if(m_missionManager != null ) m_missionManager.Init(this, m_enemyManager, m_lootManager);
+		if (m_controller != null) m_controller.Init(m_input, this);
+
+		if (m_missionManager != null ) m_missionManager.Init(this, m_enemyManager, m_lootManager);
 	}
 	public void EnableInputEvents(bool isTrue)
 	{

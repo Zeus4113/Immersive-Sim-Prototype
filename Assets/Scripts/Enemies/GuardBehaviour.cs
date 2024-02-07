@@ -19,6 +19,7 @@ namespace Enemy
 		[SerializeField] private float m_alertFalloffModifier = 1f;
 		[SerializeField] private float m_attackRange = 5f;
 		[SerializeField] private float m_attackCooldown = 5f;
+		[SerializeField] private float m_stunTime = 5f;
 
 		[Header("Audio")]
 		[SerializeField] private AudioClip m_suspiciousClip, m_passiveClip, m_alertedClip;
@@ -48,14 +49,19 @@ namespace Enemy
 			m_audioSource = GetComponent<AudioSource>();
 
 			m_perception.Init(m_data);
-			m_perception.StartLooking();
-			m_perception.StartListening();
+			//m_perception.StartLooking();
+			//m_perception.StartListening();
 
             m_perception.perceptionAlerted += UpdateAlertLevel;
 			m_perception.perceptionTick += TickAlertLevel;
 
 			StartAlerted();
         }
+
+		public EnemyManager GetManager()
+		{
+			return m_enemyManager;
+		}
 
 		private void OnCollisionEnter(Collision collision)
 		{
@@ -99,108 +105,120 @@ namespace Enemy
 			AlertLevel oldAlertLevel = AlertLevel.passive;
 			Vector3 investigationPos = Vector3.zero;
 			float attackCooldown = 0f;
-			m_perception.StartLooking();
 
 			while (c_isThinking)
 			{
-
-				switch (DetemineAlertLevel())
+				if (m_isStunned)
 				{
-
-					case AlertLevel.passive:
-
-						if (oldAlertLevel != AlertLevel.passive)
-						{
-							m_audioSource.PlayOneShot(m_passiveClip, 1f);
-						}
-
-						oldAlertLevel = AlertLevel.passive;
-						m_agent.speed = 1f;
-						m_agent.isStopped = false;
-						m_actions.StartPatrolling();
-
-						break;
-
-					case AlertLevel.suspicious:
-
-						if (oldAlertLevel != AlertLevel.suspicious) 
-						{
-							m_audioSource.PlayOneShot(m_suspiciousClip, 0.5f);
-							Debug.Log("Clip Played");
-						}
-
-
-						Debug.Log("Suspicious");
-						oldAlertLevel = AlertLevel.suspicious;
-						m_agent.speed = 2f;
-						m_agent.isStopped = false;
-
-						if (m_alertLocation != Vector3.zero)
-						{
-							m_actions.StartInvestigating(m_alertLocation);
-
-							if (m_actions.GetInvestigationPosition() != m_alertLocation)
-							{
-								m_actions.StopInvestigating();
-								m_actions.StartInvestigating(m_alertLocation);
-							}
-						}
-
-						break;
-
-					case AlertLevel.alerted:
-
-						if (oldAlertLevel != AlertLevel.alerted)
-						{
-							alertTriggered?.Invoke(this.gameObject);
-							m_audioSource.PlayOneShot(m_alertedClip, 0.75f);
-						}
-
-						oldAlertLevel = AlertLevel.alerted;
-						m_agent.speed = 3f;
-
-                        if (m_perception.GetPlayerRef() != null)
-						{
-							m_actions.StartPursuing(m_perception.GetPlayerRef());
-
-                            if (Vector3.Distance(m_perception.GetPlayerRef().position, transform.position) < m_attackRange)
-							{
-								m_agent.isStopped = true;
-								m_agent.transform.LookAt(new Vector3(m_perception.GetPlayerRef().position.x, transform.position.y, m_perception.GetPlayerRef().position.z));
-
-								if(attackCooldown <= 0)
-								{
-									m_actions.Attack(m_perception.GetPlayerRef());
-									attackCooldown = m_attackCooldown;
-								}
-							}
-							else
-							{
-								m_agent.isStopped = false;
-							}
-                        }
-						else if (m_alertLocation != Vector3.zero)
-						{
-							m_actions.StartInvestigating(m_alertLocation);
-
-							if (m_actions.GetInvestigationPosition() != m_alertLocation)
-							{
-								m_actions.StopInvestigating();
-								m_actions.StartInvestigating(m_alertLocation);
-							}
-						}
-
-						break;
+					m_actions.SetMeshColour("white");
+					//m_actions.StopAllCoroutines();
+					m_perception.StopLooking();
+					m_perception.StopListening();
+					m_agent.isStopped = true;
 				}
 
-				m_alertFloat -= (Time.fixedDeltaTime * m_alertFalloffModifier);
-				m_alertFloat = Mathf.Clamp(m_alertFloat, 0, 100);
+				else if (!m_isStunned)
+				{
+					m_perception.StartLooking();
+					m_perception.StartListening();
+
+					switch (DetemineAlertLevel())
+					{
+
+						case AlertLevel.passive:
+
+							if (oldAlertLevel != AlertLevel.passive)
+							{
+								m_audioSource.PlayOneShot(m_passiveClip, 1f);
+							}
+
+							oldAlertLevel = AlertLevel.passive;
+							m_agent.speed = 1f;
+							m_agent.isStopped = false;
+							m_actions.StartPatrolling();
+
+							break;
+
+						case AlertLevel.suspicious:
+
+							if (oldAlertLevel != AlertLevel.suspicious)
+							{
+								m_audioSource.PlayOneShot(m_suspiciousClip, 0.5f);
+								Debug.Log("Clip Played");
+							}
+
+
+							Debug.Log("Suspicious");
+							oldAlertLevel = AlertLevel.suspicious;
+							m_agent.speed = 2f;
+							m_agent.isStopped = false;
+
+							if (m_alertLocation != Vector3.zero)
+							{
+								m_actions.StartInvestigating(m_alertLocation);
+
+								if (m_actions.GetInvestigationPosition() != m_alertLocation)
+								{
+									m_actions.StopInvestigating();
+									m_actions.StartInvestigating(m_alertLocation);
+								}
+							}
+
+							break;
+
+						case AlertLevel.alerted:
+
+							if (oldAlertLevel != AlertLevel.alerted)
+							{
+								alertTriggered?.Invoke(this.gameObject);
+								m_audioSource.PlayOneShot(m_alertedClip, 0.75f);
+							}
+
+							oldAlertLevel = AlertLevel.alerted;
+							m_agent.speed = 3f;
+
+							if (m_perception.GetPlayerRef() != null)
+							{
+								m_actions.StartPursuing(m_perception.GetPlayerRef());
+
+								if (Vector3.Distance(m_perception.GetPlayerRef().position, transform.position) < m_attackRange)
+								{
+									m_agent.isStopped = true;
+									m_agent.transform.LookAt(new Vector3(m_perception.GetPlayerRef().position.x, transform.position.y, m_perception.GetPlayerRef().position.z));
+
+									if (attackCooldown <= 0)
+									{
+										m_actions.Attack(m_perception.GetPlayerRef());
+										attackCooldown = m_attackCooldown;
+									}
+								}
+								else
+								{
+									m_agent.isStopped = false;
+								}
+							}
+							else if (m_alertLocation != Vector3.zero)
+							{
+								m_actions.StartInvestigating(m_alertLocation);
+
+								if (m_actions.GetInvestigationPosition() != m_alertLocation)
+								{
+									m_actions.StopInvestigating();
+									m_actions.StartInvestigating(m_alertLocation);
+								}
+							}
+
+							break;
+					}
+
+					m_alertFloat -= (Time.fixedDeltaTime * m_alertFalloffModifier);
+					m_alertFloat = Mathf.Clamp(m_alertFloat, 0, 100);
+				}
 
 				if(attackCooldown > 0)
 				{
                     attackCooldown -= Time.fixedDeltaTime;
                 }
-
 
 				yield return new WaitForFixedUpdate();
 			}
@@ -208,6 +226,25 @@ namespace Enemy
 			m_perception.StopLooking();
 			StopAlerted();
         }
+
+		bool m_isStunned = false;
+
+		public void SetStunned()
+		{
+			if (m_isStunned) return;
+			m_isStunned = true;
+
+			Debug.Log(gameObject.name + " is Stunned");
+
+			StartCoroutine(StunDuration());
+		}
+
+		IEnumerator StunDuration()
+		{
+			yield return new WaitForSeconds(m_stunTime);
+
+			m_isStunned = false;
+		}
 
         private AlertLevel DetemineAlertLevel()
         {
@@ -233,7 +270,7 @@ namespace Enemy
         public void UpdateAlertLevel(float amount, Vector3 position)
         {
 			if(amount > m_alertFloat) m_alertFloat = amount;
-            m_alertLocation = position;
+            if(position != Vector3.zero) m_alertLocation = position;
         }
 
 		private void TickAlertLevel(float amount, Vector3 position)

@@ -11,6 +11,7 @@ public class EnemyManager : MonoBehaviour
 
 	private int m_alarmsTripped = 0;
 	private int m_guardsAlerted = 0;
+	private int m_guardsUnconcious = 0;
 
 	public void Init(GameManager gm)
 	{
@@ -56,6 +57,9 @@ public class EnemyManager : MonoBehaviour
 	{
 		IAlertable alertable = enemy.GetComponent<IAlertable>();
 		alertable.alertTriggered -= RegisterAlert;
+
+		m_guardsUnconcious++;
+
 		m_enemies.Remove(enemy);
 		Destroy(enemy);
 	}
@@ -94,5 +98,10 @@ public class EnemyManager : MonoBehaviour
 	public int GetGuardsAlerted()
 	{
 		return m_guardsAlerted;
+	}
+
+	public int GetGuardsUnconcious()
+	{
+		return m_guardsUnconcious;
 	}
 }

@@ -20,6 +20,8 @@ namespace Player
 		private Lockpick m_lockpick;
 		private Keychain m_keychain;
 		private Whacker m_whacker;
+		private Dartgun m_dartgun;
+		private Flashbang m_flashbang;
 
 		public Controller GetController()
 		{
@@ -62,6 +64,12 @@ namespace Player
 
 			m_keychain = GetComponentInChildren<Keychain>();
 			m_keychain.Init(this);
+
+			m_dartgun = GetComponentInChildren<Dartgun>();
+			m_dartgun.Init(this);
+
+			m_flashbang = GetComponentInChildren<Flashbang>();
+			m_flashbang.Init(this);
 
 			m_currentTool = Tools.keychain;
 
@@ -127,8 +135,17 @@ namespace Player
 				case Tools.flashlight:
 					m_flashlight.ToggleFlashlight();
 					break;
+
 				case Tools.whacker:
 					m_whacker.StartCharge();
+					break;
+
+				case Tools.dartgun:
+					m_dartgun.Fire();
+					break;
+
+				case Tools.flashbang:
+					m_flashbang.ThrowFlashbang();
 					break;
 			}
 		}

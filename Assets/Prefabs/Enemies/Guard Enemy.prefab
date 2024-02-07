@@ -1769,6 +1769,7 @@ MonoBehaviour:
   m_redMaterial: {fileID: 2100000, guid: 72248524cf349ab468383ffe7bb37b60, type: 2}
   m_yellowMaterial: {fileID: 2100000, guid: 195d0885b0dccdf4c8b93013a472a0d6, type: 2}
   m_greenMaterial: {fileID: 2100000, guid: 2d7fc8497baa76a4caa969f72af912fb, type: 2}
+  m_whiteMaterial: {fileID: 2100000, guid: 830fdd6f1b3e76742a34d60c6eaaf8d6, type: 2}
 --- !u!114 &3271835256275830687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1784,6 +1785,7 @@ MonoBehaviour:
   m_alertFalloffModifier: 3
   m_attackRange: 3
   m_attackCooldown: 0.5
+  m_stunTime: 5
   m_suspiciousClip: {fileID: 8300000, guid: 95bc66b36df08414c879c2e7489b1eee, type: 3}
   m_passiveClip: {fileID: 8300000, guid: d76f1cebf47381649947df1001033328, type: 3}
   m_alertedClip: {fileID: 8300000, guid: 81a1c5b936c9e2e46a5acdf91204b207, type: 3}

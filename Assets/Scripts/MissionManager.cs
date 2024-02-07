@@ -11,7 +11,8 @@ public class MissionManager : MonoBehaviour
 	private LootManager m_lootManager;
 
 	[SerializeField] float m_alarmPenalty = 5f;
-	[SerializeField] float m_guardPenalty = 10f;
+	[SerializeField] float m_guardAlertPenalty = 5f;
+	[SerializeField] float m_guardUnconciousPenalty = 5f;
 
 	[SerializeField] MissionDataScriptableObject m_data;
 
@@ -49,6 +50,8 @@ public class MissionManager : MonoBehaviour
 
 		m_data.guardsAlerted = m_enemyManager.GetGuardsAlerted();
 
+		m_data.guardsUnconcious = m_enemyManager.GetGuardsUnconcious();
+
 		m_data.grade = CalculateGrade(m_data);
 
 	}
@@ -64,28 +67,36 @@ public class MissionManager : MonoBehaviour
 
 		for(int i = 0; i < m.guardsAlerted; i++)
 		{
-			score -= m_guardPenalty;
+			score -= m_guardAlertPenalty;
+		}
+
+		for(int i = 0; i < m.guardsUnconcious; i++)
+		{
+			score -= m_guardUnconciousPenalty;
 		}
 
 		switch (score)
 		{
-			case float x when x >= 0 && x < 50:
+			case float x when x >= 0 && x < 25:
 				return 'F';
 
-			case float x when x >= 50 && x < 60:
+			case float x when x >= 25 && x < 40:
 				return 'E';
 
-			case float x when x >= 60 && x < 70:
+			case float x when x >= 40 && x < 55:
 				return 'D';
 
-			case float x when x >= 70 && x < 80:
+			case float x when x >= 55 && x < 70:
 				return 'C';
 
-			case float x when x >= 80 && x < 90:
+			case float x when x >= 70 && x < 85:
 				return 'B';
 
-			case float x when x >= 90 && x <= 100:
+			case float x when x >= 85 && x < 95:
 				return 'A';
+
+			case float x when x >= 95 && x <= 100:
+				return 'S';
 
 			default:
 				return 'U';

@@ -8,7 +8,7 @@ public class MissionSummary : MonoBehaviour
 {
 	[SerializeField] private MissionDataScriptableObject m_data;
 
-	[SerializeField] private TMPro.TextMeshProUGUI m_gradeText, m_scoreText, m_alarmText, m_guardText;
+	[SerializeField] private TMPro.TextMeshProUGUI m_gradeText, m_scoreText, m_alarmText, m_guardAlertText, m_guardUnconciousText;
 
 	private void OnEnable()
 	{
@@ -17,7 +17,8 @@ public class MissionSummary : MonoBehaviour
 			m_gradeText.text = m_data.grade.ToString();
 			m_scoreText.text = Mathf.RoundToInt(m_data.scorePercentage).ToString() + "%";
 			m_alarmText.text = m_data.alarmsTriggered.ToString();
-			m_guardText.text = m_data.guardsAlerted.ToString();
+			m_guardAlertText.text = m_data.guardsAlerted.ToString();
+			m_guardUnconciousText.text = m_data.guardsUnconcious.ToString();
 		}
 
 		Time.timeScale = 0f;

@@ -8,5 +8,6 @@ public class MissionDataScriptableObject : ScriptableObject
 	public float scorePercentage;
 	public int alarmsTriggered;
 	public int guardsAlerted;
+	public int guardsUnconcious;
 	public char grade;
 }

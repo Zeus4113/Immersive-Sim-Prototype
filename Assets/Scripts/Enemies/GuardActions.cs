@@ -48,8 +48,9 @@ namespace Enemy
 		[SerializeField] private Material m_redMaterial;
 		[SerializeField] private Material m_yellowMaterial;
 		[SerializeField] private Material m_greenMaterial;
+		[SerializeField] private Material m_whiteMaterial;
 
-        bool c_isPatrolling = false;
+		bool c_isPatrolling = false;
         Coroutine c_patrolling;
 
         bool c_isInvestigating = false;
@@ -59,7 +60,7 @@ namespace Enemy
         Coroutine c_pursuing;
 
 
-		private void SetMeshColour(string colorName)
+		public void SetMeshColour(string colorName)
 		{
 			Material mat = m_redMaterial;
 
@@ -73,6 +74,9 @@ namespace Enemy
 					break;
 				case "green":
 					mat = m_greenMaterial;
+					break;
+				case "white":
+					mat = m_whiteMaterial;
 					break;
 			}
 
@@ -302,14 +306,26 @@ namespace Enemy
 
 		public void GuardUnconcious(GameObject player)
 		{
-			if(m_isVunerable)
+			GuardBehaviour behaviour = this.GetComponent<GuardBehaviour>();
+
+			if (player == null)
 			{
 				Instantiate(m_deadBody, transform.position, transform.rotation);
+				behaviour.GetManager().RemoveEnemy(gameObject);
 				Destroy(gameObject);
 			}
-			else if(player != null && !m_isVunerable)
+			else if(player != null)
 			{
-				this.GetComponent<GuardBehaviour>().UpdateAlertLevel(100, player.transform.position);
+				if (m_isVunerable)
+				{
+					Instantiate(m_deadBody, transform.position, transform.rotation);
+					behaviour.GetManager().RemoveEnemy(gameObject);
+					Destroy(gameObject);
+				}
+				else if (!m_isVunerable)
+				{
+					this.GetComponent<GuardBehaviour>().UpdateAlertLevel(100, player.transform.position);
+				}
 			}
 		}
 
@@ -388,6 +404,8 @@ namespace Enemy
 
 		IEnumerator Countdown()
 		{
+			this.GetComponent<GuardBehaviour>().UpdateAlertLevel(100, transform.position);
+
 			yield return new WaitForSeconds(5f);
 
 			GuardUnconcious(null);

@@ -8,6 +8,7 @@ public class InteractIcon : MonoBehaviour
 	[SerializeField] private Sprite m_crosshair;
 	[SerializeField] private Sprite m_interactIcon;
 
+	private Image m_progressWheel;
 	private Image m_icon;
 	private TMPro.TextMeshProUGUI m_interactText;
 
@@ -16,6 +17,7 @@ public class InteractIcon : MonoBehaviour
 	{
 		m_icon = transform.Find("Crosshair").GetComponent<Image>();
 		m_interactText = transform.Find("Text").GetComponent<TMPro.TextMeshProUGUI>();
+		m_progressWheel = transform.Find("Progress Wheel").GetComponent<Image>();
 	}
 
 	public void ToggleInteract(bool isEnabled)
@@ -53,5 +55,10 @@ public class InteractIcon : MonoBehaviour
 				m_icon.sprite = i.GetInteractSprite();
 			}
 		}	
+	}
+
+	public void SetProgressWheel(float progress)
+	{
+		m_progressWheel.fillAmount = progress;
 	}
 }

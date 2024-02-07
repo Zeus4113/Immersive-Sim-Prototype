@@ -11,10 +11,12 @@ namespace Player
 		/// </summary>
 
 		private Toolset m_tools;
+		private InteractIcon m_icon;
 
 		public void Init(Toolset tools)
 		{
 			m_tools = tools;
+			m_icon = m_tools.GetController().GetManager().GetUIManager().GetInteractIcon();
 		}
 
 		/// <summary>
@@ -59,6 +61,8 @@ namespace Player
 			{
 				time += Time.fixedDeltaTime;
 
+				m_icon.SetProgressWheel(Mathf.Lerp(0, 1, time));
+
 				if(time > m_chargeTime)
 				{
 					Debug.Log("Charged");
@@ -69,6 +73,11 @@ namespace Player
 
 				yield return new WaitForFixedUpdate();
 
+			}
+
+			if (!m_isCharged)
+			{
+				m_icon.SetProgressWheel(0);
 			}
 
 			StopCharge();
@@ -89,6 +98,8 @@ namespace Player
 				m_audioSource.PlayOneShot(m_missSound, 0.5f);
 				m_isCharged = false;
 			}
+
+			m_icon.SetProgressWheel(0);
 		}
 
 

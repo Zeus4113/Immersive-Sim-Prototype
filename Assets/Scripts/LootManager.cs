@@ -70,6 +70,8 @@ public class LootManager : MonoBehaviour
 
 	public float GetScore()
 	{
+		if (m_totalScore == 0) return 100;
+
 		float score = (((float) m_currentScore) / ((float) m_totalScore)) * 100;
 
 		Debug.Log("Current Score: " + m_currentScore);
