@@ -25,6 +25,7 @@ public class Door : MonoBehaviour, IInteractable
 	[Header("Rotation")]
 	[SerializeField] private char m_rotationAxis = 'y';
 	[SerializeField] private bool m_isReversed = false;
+	[SerializeField] float m_doorSpeed = 1f;
 
 	private string m_interactText;
 
@@ -110,7 +111,7 @@ public class Door : MonoBehaviour, IInteractable
 					m_collider.isTrigger = true;
 					m_obstacle.carving = false;
 
-					for (int i = 0; i <= (m_rotation); i++)
+					for (int i = 0; i <= (m_rotation * m_doorSpeed); i++)
 					{
 
 						switch (m_rotationAxis)
@@ -119,11 +120,11 @@ public class Door : MonoBehaviour, IInteractable
 
 								if (m_isReversed) 
 								{
-									m_hingeTransform.Rotate(-1, 0, 0);
+									m_hingeTransform.Rotate(-1 / m_doorSpeed, 0, 0);
 								}
 								else
 								{
-									m_hingeTransform.Rotate(1, 0, 0);
+									m_hingeTransform.Rotate(1 / m_doorSpeed, 0, 0);
 								}
 
 								break;
@@ -132,11 +133,11 @@ public class Door : MonoBehaviour, IInteractable
 
 								if (m_isReversed)
 								{
-									m_hingeTransform.Rotate(0, -1, 0);
+									m_hingeTransform.Rotate(0, -1 / m_doorSpeed, 0);
 								}
 								else
 								{
-									m_hingeTransform.Rotate(0, 1, 0);
+									m_hingeTransform.Rotate(0, 1 / m_doorSpeed, 0);
 								}
 
 								break;
@@ -145,11 +146,11 @@ public class Door : MonoBehaviour, IInteractable
 
 								if (m_isReversed)
 								{
-									m_hingeTransform.Rotate(0, 0, -1);
+									m_hingeTransform.Rotate(0, 0, -1 / m_doorSpeed);
 								}
 								else
 								{
-									m_hingeTransform.Rotate(0, 0, 1);
+									m_hingeTransform.Rotate(0, 0, 1 / m_doorSpeed);
 								}
 
 								break;
@@ -178,7 +179,7 @@ public class Door : MonoBehaviour, IInteractable
 
 					m_source.PlayOneShot(m_openingSound);
 
-					for (int i = 0; i <= (m_rotation); i++)
+					for (int i = 0; i <= (m_rotation * m_doorSpeed); i++)
 					{
 						switch (m_rotationAxis)
 						{
@@ -186,11 +187,11 @@ public class Door : MonoBehaviour, IInteractable
 
 								if (m_isReversed)
 								{
-									m_hingeTransform.Rotate(1, 0, 0);
+									m_hingeTransform.Rotate(1 / m_doorSpeed, 0, 0);
 								}
 								else if(!m_isReversed)
 								{
-									m_hingeTransform.Rotate(-1, 0, 0);
+									m_hingeTransform.Rotate(-1 / m_doorSpeed, 0, 0);
 								}
 
 								break;
@@ -199,11 +200,11 @@ public class Door : MonoBehaviour, IInteractable
 
 								if (m_isReversed)
 								{
-									m_hingeTransform.Rotate(0, 1, 0);
+									m_hingeTransform.Rotate(0, 1 / m_doorSpeed, 0);
 								}
 								else if (!m_isReversed)
 								{
-									m_hingeTransform.Rotate(0, -1, 0);
+									m_hingeTransform.Rotate(0, -1 / m_doorSpeed, 0);
 								}
 
 								break;
@@ -212,11 +213,11 @@ public class Door : MonoBehaviour, IInteractable
 
 								if (m_isReversed)
 								{
-									m_hingeTransform.Rotate(0, 0, 1);
+									m_hingeTransform.Rotate(0, 0, 1 / m_doorSpeed);
 								}
 								else if (!m_isReversed)
 								{
-									m_hingeTransform.Rotate(0, 0, -1);
+									m_hingeTransform.Rotate(0, 0, -1 / m_doorSpeed);
 								}
 
 								break;

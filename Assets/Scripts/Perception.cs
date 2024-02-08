@@ -231,7 +231,7 @@ namespace Enemy
 								perceptionTick?.Invoke(volume * m_volumeModifier, c.transform.position);
 							}
 
-							//Debug.Log(volume);
+							//Debug.Log(gameObject.name + " " + volume);
 
 						}
 					}

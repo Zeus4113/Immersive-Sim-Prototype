@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canLook: 1
   canListen: 0
-  lookRange: 10
+  lookRange: 15
   listenRange: 0
   lookThreshold: 50
   listenThreshold: 0

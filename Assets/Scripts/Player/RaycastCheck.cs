@@ -93,7 +93,7 @@ public class RaycastCheck : MonoBehaviour
 		{
 			RaycastHit hit;
 			Physics.Raycast(lightSource.position, (raycastOrigins[i].position - lightSource.position).normalized, out hit, 10000, mask);
-			Debug.DrawLine(lightSource.position, raycastOrigins[i].position, Color.red, 0.1f);
+			//Debug.DrawLine(lightSource.position, raycastOrigins[i].position, Color.red, 0.1f);
 
 			if (hit.collider != null)
 			{

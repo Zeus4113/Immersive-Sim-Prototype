@@ -12,6 +12,7 @@ namespace Player
 
 		private PlayerInput m_input;
 		private Controller m_controller;
+		private LayerMask m_mask;
 
 		[SerializeField] private Transform m_pickupTransform;
 		[SerializeField] private Transform m_dropTransform;
@@ -20,6 +21,7 @@ namespace Player
 		{
 			m_input = playerInput;
 			m_controller = controller;
+			m_mask = LayerMask.GetMask("Interactables", "Environment");
 
 			if (m_input != null)
 			{
@@ -107,6 +109,8 @@ namespace Player
 		{
 			while (c_isChecking && m_interactables.Count > 0)
 			{
+				//Debug.Log(m_interactables);
+
 				UpdateIcon?.Invoke(GetLowestDistance(m_interactables.ToArray()));
 
 				yield return new WaitForFixedUpdate();
@@ -120,13 +124,24 @@ namespace Player
 
 		private void OnTriggerEnter(Collider other)
 		{
+			Debug.Log(other.gameObject.name);
+
 			if (m_interactables.Contains(other.gameObject)) return;
 
-			LayerMask layerMask = LayerMask.GetMask("Interactables", "Environment");
+			Debug.Log(other.gameObject.name + " passed");
+
 			RaycastHit hit;
-			Physics.Raycast(transform.parent.position, other.transform.position - transform.parent.position, out hit, 5f, layerMask);
+
+			Physics.Raycast(transform.parent.position, other.transform.position - transform.parent.position, out hit, Mathf.Infinity, m_mask);
+			Debug.DrawRay(transform.parent.position, other.transform.position - transform.parent.position, Color.green, 5f);
+
+			Debug.Log(hit.collider.transform.parent.gameObject.name + " hit");
+			Debug.Log(hit.collider.gameObject.name + " " + hit.collider.gameObject.layer);
 
 			if (hit.collider != other) return;
+
+			Debug.Log(hit.collider.gameObject.name + " passed hit");
+
 			m_interactables.Add(hit.collider.gameObject);
 
 			if(!m_isPickedUp) StartChecking();
