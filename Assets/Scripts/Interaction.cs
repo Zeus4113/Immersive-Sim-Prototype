@@ -124,23 +124,13 @@ namespace Player
 
 		private void OnTriggerEnter(Collider other)
 		{
-			Debug.Log(other.gameObject.name);
-
 			if (m_interactables.Contains(other.gameObject)) return;
-
-			Debug.Log(other.gameObject.name + " passed");
 
 			RaycastHit hit;
 
 			Physics.Raycast(transform.parent.position, other.transform.position - transform.parent.position, out hit, Mathf.Infinity, m_mask);
-			Debug.DrawRay(transform.parent.position, other.transform.position - transform.parent.position, Color.green, 5f);
-
-			Debug.Log(hit.collider.transform.parent.gameObject.name + " hit");
-			Debug.Log(hit.collider.gameObject.name + " " + hit.collider.gameObject.layer);
 
 			if (hit.collider != other) return;
-
-			Debug.Log(hit.collider.gameObject.name + " passed hit");
 
 			m_interactables.Add(hit.collider.gameObject);
 

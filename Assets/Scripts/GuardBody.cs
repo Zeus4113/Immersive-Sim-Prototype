@@ -32,14 +32,11 @@ public class GuardBody : MonoBehaviour, IInteractable
 			yield return new WaitForFixedUpdate();
 		}
 
-		gameObject.layer = LayerMask.NameToLayer("Interactables");
-
-		Debug.Log("Layer Set: " + gameObject.layer);
+		//gameObject.layer = LayerMask.NameToLayer("Interactables");
 	}
 
 	public void Interact(Player.Interaction interactor)
 	{
-		Debug.LogWarning("Interact Triggered");
 		m_isPickedUp = !m_isPickedUp;
 
 		if (m_isPickedUp)

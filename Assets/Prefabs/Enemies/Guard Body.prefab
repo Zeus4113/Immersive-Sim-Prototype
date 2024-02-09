@@ -840,7 +840,7 @@ GameObject:
   - component: {fileID: 7813609700446219612}
   - component: {fileID: 7303244246381015127}
   - component: {fileID: 8985244308869838572}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Guard Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -878,9 +878,9 @@ MonoBehaviour:
   m_bodyMesh: {fileID: 6672120933416859288}
   m_rigidbody: {fileID: 8985244308869838572}
   m_collider: {fileID: 4170713488787667495}
-  m_interactTextPickup: Pickup
+  m_interactTextPickup: Pickup Body
   m_interactSpritePickup: {fileID: 21300000, guid: faa4a28c0f1220c4aae2eff2b7e182a7, type: 3}
-  m_interactTextDrop: Drop
+  m_interactTextDrop: Drop Body
   m_interactSpriteDrop: {fileID: 21300000, guid: faa4a28c0f1220c4aae2eff2b7e182a7, type: 3}
 --- !u!135 &7303244246381015127
 SphereCollider:
