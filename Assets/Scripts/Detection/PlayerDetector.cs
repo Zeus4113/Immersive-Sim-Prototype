@@ -37,6 +37,14 @@ public class PlayerDetector : MonoBehaviour
 
 	}
 
+	private void OnDestroy()
+	{
+		if (m_playerTransform == null) return;
+
+		m_playerTransform.GetComponent<VisibilityCalculator>().RemoveLight(this);
+		m_playerTransform = null;
+	}
+
 	bool c_isPresent = false;
 	Coroutine c_present;
 

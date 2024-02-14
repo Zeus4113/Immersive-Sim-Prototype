@@ -230,6 +230,14 @@ namespace Enemy
             Vector3 investigationPosition = targetPosition;
 			m_investigationPosition = targetPosition;
 
+			NavMeshPath navPath = new NavMeshPath();
+			NavMeshHit hit;
+
+			m_agent.CalculatePath(m_investigationPosition, navPath);
+			NavMesh.SamplePosition(m_investigationPosition, out hit, 5f, NavMesh.AllAreas);
+
+			if (navPath.status == NavMeshPathStatus.PathInvalid) m_investigationPosition = hit.position;
+
 			Vector3[] pointsInArea = GetRandomPointsInArea(investigationPosition, 5, 2f);
 
             int pointsInAreaIndex = 0;
@@ -270,7 +278,22 @@ namespace Enemy
 				if (playerTransform == null) trackingPlayer = false;
 
 				Vector3 playerPosition = playerTransform.position;
-                m_agent.destination = playerPosition;
+
+				NavMeshPath navPath = new NavMeshPath();
+
+				m_agent.CalculatePath(playerPosition, navPath);
+
+				if (navPath.status == NavMeshPathStatus.PathInvalid)
+				{
+					NavMeshHit hit;
+					NavMesh.SamplePosition(playerPosition, out hit, 5f, NavMesh.AllAreas);
+					playerPosition = hit.position;
+					Debug.Log("Sampled Position: " + playerPosition);
+				}
+
+				Debug.Log("Player: " + playerPosition);
+
+				m_agent.destination = playerPosition;
 
                 yield return new WaitForFixedUpdate();
             }

@@ -37,7 +37,7 @@ namespace Player
 			}
 			else
 			{
-				foreach (GameObject x in m_interactables)
+				foreach (GameObject x in m_accessableInteractables)
 				{
 					if (x.GetComponent<IInteractable>() != null)
 					{
@@ -105,13 +105,24 @@ namespace Player
 			c_checking = null;
 		}
 
+		List<GameObject> m_accessableInteractables = new List<GameObject>();
+
 		IEnumerator CheckingInteractables()
 		{
 			while (c_isChecking && m_interactables.Count > 0)
 			{
-				//Debug.Log(m_interactables);
+				foreach(GameObject obj in m_interactables)
+				{
+					RaycastHit hit;
 
-				UpdateIcon?.Invoke(GetLowestDistance(m_interactables.ToArray()));
+					Physics.Raycast(transform.parent.position, obj.transform.position - transform.parent.position, out hit, Mathf.Infinity, m_mask);
+					Debug.DrawRay(transform.parent.position, obj.transform.position - transform.parent.position, Color.green, 10f);
+
+					if (hit.collider == obj.GetComponent<Collider>() && !m_accessableInteractables.Contains(obj)) m_accessableInteractables.Add(obj);
+				}
+
+				if(m_accessableInteractables.Count > 0) UpdateIcon?.Invoke(GetLowestDistance(m_accessableInteractables.ToArray()));
+				else UpdateIcon?.Invoke(null);
 
 				yield return new WaitForFixedUpdate();
 			}
@@ -125,14 +136,7 @@ namespace Player
 		private void OnTriggerEnter(Collider other)
 		{
 			if (m_interactables.Contains(other.gameObject)) return;
-
-			RaycastHit hit;
-
-			Physics.Raycast(transform.parent.position, other.transform.position - transform.parent.position, out hit, Mathf.Infinity, m_mask);
-
-			if (hit.collider != other) return;
-
-			m_interactables.Add(hit.collider.gameObject);
+			m_interactables.Add(other.gameObject);
 
 			if(!m_isPickedUp) StartChecking();
 		}
@@ -141,6 +145,9 @@ namespace Player
 		{
 			if (!m_interactables.Contains(other.gameObject)) return;
 			m_interactables.Remove(other.gameObject);
+
+			if (!m_accessableInteractables.Contains(other.gameObject)) return;
+			m_accessableInteractables.Remove(other.gameObject);
 		}
 
 		// Extra Functions
