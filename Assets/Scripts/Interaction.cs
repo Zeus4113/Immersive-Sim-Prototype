@@ -143,11 +143,16 @@ namespace Player
 
 		private void OnTriggerExit(Collider other)
 		{
-			if (!m_interactables.Contains(other.gameObject)) return;
-			m_interactables.Remove(other.gameObject);
+			if (m_interactables.Contains(other.gameObject))
+			{
+				m_interactables.Remove(other.gameObject);
+			}
 
-			if (!m_accessableInteractables.Contains(other.gameObject)) return;
-			m_accessableInteractables.Remove(other.gameObject);
+			if (m_accessableInteractables.Contains(other.gameObject))
+			{
+				Debug.Log(other.gameObject.name + " removed");
+				m_accessableInteractables.Remove(other.gameObject);
+			}
 		}
 
 		// Extra Functions
