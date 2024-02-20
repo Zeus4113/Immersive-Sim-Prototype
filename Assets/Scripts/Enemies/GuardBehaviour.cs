@@ -20,6 +20,7 @@ namespace Enemy
 		[SerializeField] private float m_attackRange = 5f;
 		[SerializeField] private float m_attackCooldown = 5f;
 		[SerializeField] private float m_stunTime = 5f;
+		[SerializeField] private ParticleSystem m_particleSystem;
 
 		[Header("Audio")]
 		[SerializeField] private AudioClip m_suspiciousClip, m_passiveClip, m_alertedClip;
@@ -110,7 +111,12 @@ namespace Enemy
 			{
 				if (m_isStunned)
 				{
+					m_actions.StopPatrolling();
+					m_actions.StopInvestigating();
+					m_actions.StopPursuing();
+
 					m_actions.SetMeshColour("white");
+					UpdateAlertLevel(100, transform.position);
 					//m_actions.StopAllCoroutines();
 					m_perception.StopLooking();
 					m_perception.StopListening();
@@ -122,7 +128,7 @@ namespace Enemy
 					m_perception.StartLooking();
 					m_perception.StartListening();
 
-					switch (DetemineAlertLevel())
+                    switch (DetemineAlertLevel())
 					{
 
 						case AlertLevel.passive:
@@ -241,9 +247,13 @@ namespace Enemy
 
 		IEnumerator StunDuration()
 		{
-			yield return new WaitForSeconds(m_stunTime);
+			m_particleSystem.Play();
 
-			m_isStunned = false;
+            yield return new WaitForSeconds(m_stunTime);
+
+			m_particleSystem.Stop();
+
+            m_isStunned = false;
 		}
 
         private AlertLevel DetemineAlertLevel()

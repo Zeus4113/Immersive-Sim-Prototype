@@ -26,6 +26,7 @@ namespace Player
 		/// 
 
 		[SerializeField] private AudioClip m_fireSound, m_emptySound;
+		[SerializeField] private ParticleSystem m_particleSystem;
 		[SerializeField] private int m_maxDarts = 3;
 		private int m_currentDarts;
 
@@ -49,8 +50,9 @@ namespace Player
 
 			Physics.Raycast(transform.position, transform.forward, out hit, 100f, layerMask);
 			Debug.DrawRay(transform.position, transform.forward * 100f, Color.red, 5f);
+			m_particleSystem.Play();
 
-			if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemies"))
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemies"))
 			{
 				hit.collider.gameObject.GetComponentInParent<Enemy.GuardActions>().StartCountdown();
 			}

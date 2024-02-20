@@ -28,21 +28,23 @@ public class Flash : MonoBehaviour
 
 		LayerMask mask = LayerMask.GetMask("Enemies");
 
-		Collider[] col = Physics.OverlapSphere(transform.position, 10f, mask);
+		Collider[] col = Physics.OverlapSphere(transform.position, 8f, mask);
 
-		LayerMask raymask = LayerMask.GetMask("Environment", "Enemies", "Interactables");
+		LayerMask raymask = LayerMask.GetMask("Environment", "Enemies");
 
 		foreach (Collider c in col)
 		{
-			Debug.Log(c.gameObject.name);
+			//Debug.Log(c.gameObject.name);
 
 			RaycastHit hit;
-			Physics.Raycast(transform.position, c.transform.position - transform.position, out hit, raymask);
-			Debug.DrawRay(transform.position, c.transform.position - transform.position, Color.white, 10f);
+			Physics.Raycast(transform.position, (c.transform.position - transform.position) + new Vector3(0, 0.5f, 0), out hit, raymask);
+			Debug.DrawRay(transform.position, (c.transform.position - transform.position) + new Vector3(0, 0.5f, 0), Color.white, 10f);
 
-			if (hit.collider == c)
+            //Debug.Log(hit.collider.gameObject + " " + hit.collider.gameObject.name);
+
+            if (hit.collider == c)
 			{
-				Debug.Log(c.gameObject.name);
+				//Debug.Log(c.gameObject.name);
 				c.gameObject.GetComponentInParent<Enemy.GuardBehaviour>().SetStunned();
 			}
 
