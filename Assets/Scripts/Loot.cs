@@ -44,6 +44,7 @@ public class Loot : MonoBehaviour, IInteractable
 	{
 		this.GetComponent<AudioSource>().Play();
 		this.transform.position = m_manager.transform.position;
+		m_manager.RemoveLoot(this);
 
 		yield return new WaitForSeconds(1.5f);
 

@@ -288,10 +288,10 @@ namespace Enemy
 					NavMeshHit hit;
 					NavMesh.SamplePosition(playerPosition, out hit, 5f, NavMesh.AllAreas);
 					playerPosition = hit.position;
-					Debug.Log("Sampled Position: " + playerPosition);
+					//Debug.Log("Sampled Position: " + playerPosition);
 				}
 
-				Debug.Log("Player: " + playerPosition);
+				//Debug.Log("Player: " + playerPosition);
 
 				m_agent.destination = playerPosition;
 
@@ -388,8 +388,6 @@ namespace Enemy
 
 				randomPoints[i] = centre + new Vector3(Random.insideUnitCircle.x * radius, centre.y, Random.insideUnitCircle.y * radius);
 				m_agent.CalculatePath(randomPoints[i], path);
-
-				Debug.Log(randomPoints[i]);
 
 				int counter = 0;
 

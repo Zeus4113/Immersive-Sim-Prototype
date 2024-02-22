@@ -40,7 +40,7 @@ public class Flash : MonoBehaviour
 			Physics.Raycast(transform.position, (c.transform.position - transform.position) + new Vector3(0, 0.5f, 0), out hit, raymask);
 			Debug.DrawRay(transform.position, (c.transform.position - transform.position) + new Vector3(0, 0.5f, 0), Color.white, 10f);
 
-            //Debug.Log(hit.collider.gameObject + " " + hit.collider.gameObject.name);
+            Debug.Log(hit.collider.gameObject + " " + hit.collider.gameObject.name);
 
             if (hit.collider == c)
 			{

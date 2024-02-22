@@ -54,6 +54,8 @@ public class LootManager : MonoBehaviour
 
 	public void RemoveLoot(Loot newItem)
 	{
+		if (!m_lootList.Contains(newItem)) return;
+
 		m_currentScore += newItem.GetValue();
 
 		if (newItem.GetRequiredItem()) m_currentRequiredItems++;

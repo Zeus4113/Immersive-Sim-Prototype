@@ -154,7 +154,7 @@ namespace Enemy
 							}
 
 
-							Debug.Log("Suspicious");
+							//Debug.Log("Suspicious");
 							oldAlertLevel = AlertLevel.suspicious;
 							m_agent.speed = 2f;
 							m_agent.isStopped = false;
